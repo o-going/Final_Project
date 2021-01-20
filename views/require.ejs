@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%=id%></title>
+</head>
+<script type="text/javascript">
+  // https://stove99.tistory.com/45 문자열 escape 변형 관련
+  function decodeHTML(text){
+    return String(text).substring(1,text.length-1)
+                       .replace(/&amp;/g, "&")
+                       .replace(/&lt;/g, "<")
+                       .replace(/&quot;/g, "\"")
+                       .replace(/&gt;/g, ">")
+                       .replace(/&nbsp;/g, '\n')
+  }
+  // https://meaningone.tistory.com/301
+  // https://developer.mozilla.org/ko/docs/Web/Events/load
+  window.addEventListener("load", function(){
+    htmls = document.querySelectorAll(".info")
+    for (html of htmls) {
+      html.innerHTML = decodeHTML(html.innerHTML)
+    }
+  })
+</script>
+<body>
+  <div>
+    <p id="position" class="info"><%=position_info.position_Info%></p>
+  </div>
+  <div>
+    <p id="requirement" class="info"><%=position_info.requirement%></p>
+  </div>
+  <div>
+    <p id="preference" class="info"><%=position_info.preference%></p>
+  </div>
+</body>
+</html>
