@@ -12,6 +12,12 @@
    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
    
+   <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css"></link>
+
+   <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+   <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
+   <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
+
    <link rel="stylesheet" href="css/style.css">
    <link rel="stylesheet" href="css/techtree.css">
    <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -22,7 +28,10 @@
   <!-- Navigation-->
   <nav id="menu" class="navbar navbar-default navbar-fixed-top">
     <div class="container"> 
-
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <a class="navbar-brand page-scroll" href="/">Logo</a> 
+      </div>
       <div class="navbar-brand" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav navbar-right">
           <li><a href="techtree" class="page-scroll">TechTree</a></li>
@@ -35,46 +44,304 @@
     Scale nodes and edges depending on their value. Hover over nodes and edges to
     get more information.
   </p> -->
-  <div id="optionsContainer"></div>
-  <div id="mynetwork">
-  </div>
-  <div class="right">
-    <div class="skill">
-      <div class="company_co text-center">
-        <h1>선택 기술</h1>
-        <p>Java, JavaScript, Python, MySQL, Node.js</p>
-      </div>
-    </div>
 
-    <div class="position">
-      <div class="company_co text-center">
-        <h1>관련 직무</h1>
-        <p>서버/백엔드, 프론트엔드, 웹 풀스택, 안드로이드 앱, 데이터 엔지니어</p>
-      </div>
-    </div>
+  <!-- <div id="search">
+  </div> -->
+  <button class="btn btn-primary ml-5" data-toggle="portfilter" data-target="all" onclick="recommend()">  <!--click 했을 때 event-->
+    다음
+  </button>
 
-    <div class="company_co text-center">
-      <h1>기업 추천</h1>
-      <p>선택된 기술들에 관한 구인공고</p>
-    </div>
-    <% for(i in reco) { %>
-      <% let r = reco[i] %>
-        <div class="reco-list">
-          <a href="/require/<%=r.positionId%>">
-            <div class="pictures">
-              <img src="<%=r.logo%>">
-            
-              <div class="caption">
-                <h4><%= r.position %></h4>
-                <p class="company"><%=r.company %></p>
-                <p>Java, 안드로이드 앱 <b>92%</b></p>
-              </div>
-            </div>
-          </a>
-        </div>
-    <% } %>
-  </div>
-  <script>
+  <script type="text/javascript">
+
+    function recommend() {  // click 했을 떄 event 함수
+      let save = [];
+      let save2 = [];
+      search_select_node(root, save)
+      for(i of save) {
+        save2.push(i.name); //save 객체의 name만 뽑아서 push
+      }
+      console.log(save2);
+      console.log(save);
+      //fetch("/recommend2?data="+JSON.stringify(save2))
+      window.location = "/recommend?data="+encodeURIComponent(JSON.stringify(save2)) // window.location으로 주소로 data를 문자열로 보내줌
+    }
+
+    //basically a way to get the path to an object
+    function searchTree(obj,search,path){
+      if(obj.name === search){ //if search is found return, add the object to the path and return it
+        path.push(obj);
+        return path;
+      }
+      else if(obj.children || obj._children){ //if children are collapsed d3 object will have them instantiated as _children
+        var children = (obj.children) ? obj.children : obj._children;
+        for(var i=0; i<children.length; i++){
+          path.push(obj);// we assume this path is the right one
+          var found = searchTree(children[i],search,path);
+          if(found){// we were right, this should return the bubbled-up path from the first if statement
+            return found;
+          }
+          else{//we were wrong, remove this parent from the path and continue iterating
+            path.pop();
+          }
+        }
+      }
+      else{//not the right object, return false so it will continue to iterate in the loop
+        return false;
+      }
+      
+    }
+
+    function search_select_node(obj, path){ 
+      let root = "Programming Language";
+      if(obj.children || obj._children){ //if children are collapsed d3 object will have them instantiated as _children
+        var children = (obj.children) ? obj.children : obj._children; // children이 펴져있는 애들이면 children, 접혀있는 애들이면 _children
+        let flag = true;
+        for(var i=0; i<children.length; i++){ 
+          if (children[i].class == 'found') { // children의 class가(선택되어) found면
+            search_select_node(children[i],path); // 재귀로 children을 계속 돔
+            // flag = false; // flag를 false로 변환(없으면) => 걸림
+          }
+        }
+        if (flag) { 
+          if(obj.name != root) {
+            path.push(obj); // 만약 class가 found면 path에 해당 children을 넣어줌
+          }
+          // path.push(obj); // path에 해당 children을 넣어줌
+        }
+      }else {
+        if(obj.class == 'found'){
+          if(obj.name != root) {
+            path.push(obj); // 만약 class가 found면 path에 해당 children을 넣어줌
+          }
+        }
+      }
+    }
+  
+    function extract_select2_data(node,leaves,index) {
+            if (node.children){
+                for(var i = 0; i<node.children.length; i++){
+                    index = extract_select2_data(node.children[i],leaves,index)[0];
+                }
+            }
+            else {
+                leaves.push({id:++index,text:node.name});
+            }
+            return [index,leaves];
+    }
+  
+    var div = d3.select("body")
+      .append("div") // declare the tooltip div
+      .attr("class", "tooltip")
+      .style("opacity", 0);
+  
+    var margin = {top: 50, right: 200, bottom: 20, left: 250},
+      width = 960 - margin.right - margin.left,
+      height = 800 - margin.top - margin.bottom;
+  
+    var i = 0,
+      duration = 750,
+      root,
+      select2_data;
+  
+    var diameter = 960;
+  
+    var tree = d3.layout.tree()
+      .size([height, width]);
+  
+    var diagonal = d3.svg.diagonal()
+      .projection(function(d) { return [d.y, d.x]; });
+  
+    var svg = d3.select("body").append("svg")
+      .attr("width", width + margin.right + margin.left)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  
+    //recursively collapse children
+    function collapse(d) {
+      if (d.children) {
+        d._children = d.children;
+        d._children.forEach(collapse);
+        d.children = null;
+      }
+    }
+  
+    // Toggle children on click
+    function click(d) {
+      if(d.class == 'found') {
+        d.class = '';
+      }else {
+        d.class = 'found';
+      }
+
+      if (d.children) {
+        d._children = d.children;
+        d.children = null;
+        }
+        else{
+        d.children = d._children;
+        d._children = null;
+        }
+      update(d);
+    }
+  
+    function openPaths(paths) {
+      for(var i =0; i<paths.length; i++){
+        if(paths[i].id !== "1"){
+          paths[i].class = 'found';
+          if(paths[i]._children){
+            paths[i].children = paths[i]._children;
+              paths[i]._children = null;
+          }
+          update(paths[i]);
+        }
+      }
+    }
+  
+    d3.json("js/data.json", function(error,values){
+      root = values;
+      select2_data = extract_select2_data(values,[],0)[1];
+      root.x0 = height / 2;
+      root.y0 = 0;
+      root.children.forEach(collapse);
+      update(root);
+      //init search box
+      $("#search").select2({
+        data: select2_data,
+        containerCssClass: "search"
+      });
+    });
+    //attach search box listener
+    $("#search").on("select2-selecting", function(e) {
+      var paths = searchTree(root,e.object.text,[]);
+      if(typeof(paths) !== "undefined"){
+        openPaths(paths);
+        console.log(paths);
+      }
+      else{
+        alert(e.object.text+" not found!");
+      }
+    })
+  
+    d3.select(self.frameElement).style("height", "1000px");
+  
+    function update(source) {
+      // Compute the new tree layout.
+      var nodes = tree.nodes(root).reverse(),
+      links = tree.links(nodes);
+  
+      // Normalize for fixed-depth.
+      nodes.forEach(function(d) { d.y = d.depth * 180; });
+  
+      // Update the nodesâ€¦
+      var node = svg.selectAll("g.node")
+        .data(nodes, function(d) { return d.id || (d.id = ++i); });
+  
+      // Enter any new nodes at the parent's previous position.
+      var nodeEnter = node.enter().append("g")
+      .attr("class", "node")
+      .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
+      .on("click", click);
+  
+      nodeEnter.append("circle")
+      .attr("r", 1e-6)
+      .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+  
+      nodeEnter.append("text")
+        .attr("x", function(d) { return d.children || d._children ? -10 : 10; })
+        .attr("dy", ".35em")
+        .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+        .text(function(d) { return d.name; })
+        .style("fill-opacity", 1e-6);
+  
+      // Transition nodes to their new position.
+      var nodeUpdate = node.transition()
+        .duration(duration)
+        .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+  
+      nodeUpdate.select("circle")
+        .attr("r", 4.5)
+        .style("fill", function(d) {
+          if(d.class === "found"){
+            return "#ff4136"; //red
+          }
+          else if(d._children){
+            return "lightsteelblue";
+          }
+          else{
+            return "#fff";
+          }
+        })
+        .style("stroke", function(d) {
+          if(d.class === "found"){
+            return "#ff4136"; //red
+          }
+      });
+  
+      nodeUpdate.select("text")
+        .style("fill-opacity", 1);
+  
+      // Transition exiting nodes to the parent's new position.
+      var nodeExit = node.exit().transition()
+        .duration(duration)
+        .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
+        .remove();
+  
+      nodeExit.select("circle")
+        .attr("r", 1e-6);
+  
+      nodeExit.select("text")
+        .style("fill-opacity", 1e-6);
+  
+      // Update the linksâ€¦
+      var link = svg.selectAll("path.link")
+        .data(links, function(d) { return d.target.id; });
+  
+      // Enter any new links at the parent's previous position.
+      link.enter().insert("path", "g")
+        .attr("class", "link")
+        .attr("d", function(d) {
+          var o = {x: source.x0, y: source.y0};
+          return diagonal({source: o, target: o});
+        });
+  
+      // Transition links to their new position.
+      link.transition()
+        .duration(duration)
+        .attr("d", diagonal)
+        .style("stroke",function(d){
+          if(d.target.class==="found"){
+            return "#ff4136";
+          }
+        });
+  
+      // Transition exiting nodes to the parent's new position.
+      link.exit().transition()
+        .duration(duration)
+        .attr("d", function(d) {
+          var o = {x: source.x, y: source.y};
+          return diagonal({source: o, target: o});
+        })
+        .remove();
+  
+      // Stash the old positions for transition.
+      nodes.forEach(function(d) {
+        d.x0 = d.x;
+        d.y0 = d.y;
+        });
+    }
+  </script>
+
+
+
+
+
+
+
+
+
+
+  <!-- <script>
     var nodes = null;
     var edges = null;
     var network = null;
@@ -167,6 +434,6 @@ window.addEventListener("load", () => {
     });
 });
 
-  </script>
+  </script> -->
 </body>
 </html>

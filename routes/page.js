@@ -263,9 +263,7 @@ async function get_dataset() {
         break;
       }
     }    
-  }    
-  console.log(reco);
-  
+  }   
 
   // console.log(nodes);
   // console.log(edges);
@@ -348,19 +346,74 @@ router.get('/dataset', async(req, res) => {
   });
 })
 
-router.get('/recommend', (req, res) => {
-  res.render('recommend');
+// router.get('/recommend', async (req, res) => {
+//   try {
+//     var query = "SELECT "
+//     query += "positions.position,companies.logo_src,companies.company,positions.positionId "
+//     query += "from companies JOIN positions ON companies.companyId = positions.companyId order by rand() LIMIT 8"
+//     var [random, _]= await con.query(query);
+//   }catch(err) {
+//     console.log(err);
+//   }
+
+//   res.render('recommend', {
+//     companies: random
+//   });
+// });
+
+router.get('/recommend', async(req, res) => {  // 얻어온 data
+  if(req.query.data != null) {
+    let tech = JSON.parse(decodeURIComponent(req.query.data));  // tech 변수에 string 객체를 json 객체로 변환
+    console.log(tech)
+  //let tech = JSON.parse(body);
+
+  try {
+    let query = "SELECT "
+    query += "positions.position,companies.logo_src,companies.company,positions.positionId,positions.tech_stack "
+    query += "from companies JOIN positions ON companies.companyId = positions.companyId WHERE "
+    query += `positions.tech_stack LIKE '%"${tech[0]}"%' `
+    for(i=1; i<tech.length; i++) {
+      query += `OR positions.tech_stack LIKE '%"${tech[i]}"%' ` // tech[i]인 data만 가져옴 AND => 다 속하는 거 OR => 속한거 다
+    }
+    var [random, _]= await con.query(query);  // random 함수에 query를 넣음
+  }catch(err) {
+    console.log(err);
+  }
+
+  res.render('recommend', {
+    companies: random,
+    tech: tech
+  });
+
+  }else {
+      try {
+    var query = "SELECT "
+    query += "positions.position,companies.logo_src,companies.company,positions.positionId,positions.tech_stack "
+    query += "from companies JOIN positions ON companies.companyId = positions.companyId order by rand() LIMIT 8"
+    var [random, _]= await con.query(query);
+  }catch(err) {
+    console.log(err);
+  }
+
+  res.render('recommend', {
+    companies: random,
+    tech: undefined
+  });
+  }
+  
 });
 
 router.get('/require/:id', async (req, res) => {
   var id = req.params.id   // /require/1
   // var id = req.query.id // /require?id=1
+  let data = req.query.data
   // let position = req.params.position
   // try{
     // let positionInfo = await con.query('SELECT `positionId`, `position`,`position_Info`,`requirement`,`preference` FROM final.positions WHERE positionId='+id);
     let query = "SELECT "
-    query += "positionId, position, position_Info, requirement, preference "
-    query += "FROM final.positions WHERE positionId="+id
+    query += "positionId, companies.company, positions.position, positions.position_Info, positions.requirement, positions.preference, positions.tech_stack "
+    query += "FROM positions JOIN companies ON positions.companyId = companies.companyId WHERE positionId="+id
+    // WHERE positionId="+id
     let positionInfo = await con.query(query)
     let info = positionInfo[0][0]
     // console.log(info);
@@ -371,34 +424,32 @@ router.get('/require/:id', async (req, res) => {
     positionInfo[0][0].position_Info = text
 
     let require = info.requirement
-     let buff1 = Buffer.from(require, 'base64')
-     let text1 = buff1.toString('utf-8')
-     positionInfo[0][0].requirement = text1
+    let buff1 = Buffer.from(require, 'base64')
+    let text1 = buff1.toString('utf-8')
+    positionInfo[0][0].requirement = text1
 
     let pre = info.preference
     let buff2 = new Buffer.from(pre, 'base64')
     let text2 = buff2.toString('utf-8')
     positionInfo[0][0].preference = text2
+  
   // }catch(err) {
 
   // }
   res.render('require', {
     id : req.params.id ,
     position_info: positionInfo[0][0],
+    tech: data
   });
 
-});
-
-router.get('/wanted', (req, res) => {
-  res.render('wanted');
 });
 
 router.get('/', async (req, res) => {  
   try{
     // var[logos, column] = await con.query ( 'SELECT `companyId`,`logo_src` FROM final.companies' );
     var query = "SELECT "
-        query += "positions.position,companies.logo_src,companies.company,positions.positionId "
-        query += "from companies JOIN positions ON companies.companyId = positions.companyId order by rand() LIMIT 4"
+        query += "positions.position,companies.logo_src,companies.company,positions.positionId,positions.tech_stack "
+        query += "from companies JOIN positions ON companies.companyId = positions.companyId order by rand() LIMIT 6"
     var [random, _]= await con.query(query);
     // console.log(random)
     

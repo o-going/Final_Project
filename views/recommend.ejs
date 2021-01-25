@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!--Bootstrap-->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <title>Main</title>
+</head>
+<body>
+<!-- Navigation-->
+  <nav id="menu" class="navbar navbar-default navbar-fixed-top">
+    <div class="container"> 
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <a class="navbar-brand page-scroll" href="/">Logo</a> 
+      </div>
+      <div class="navbar-brand" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="techtree" class="page-scroll">TechTree</a></li>
+          <li><a href="Login" class="page-scroll">Login</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div class="content">
+    <div class="container">
+      <div class="row">
+        <div class="reco-title col-12">
+          <h3 class="text-center">기업 추천</h3>
+        </div>
+        <div class="reco-desc col-12 ml-2">
+          <p class="text-center">선택한 기술들에 맞는 구인공고 입니다.</p>
+        </div>
+        <div class="select_skill col-12 text-center">
+          <p>선택 기술: <strong><%=tech %></strong></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="reco-tag">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6 mx-auto">
+              <div id="custom-search-input">
+                  <div class="input-group col-md-12">
+                      <input type="text" id="search" class="form-control input-lg" placeholder="Search" />
+                      <span class="input-group-btn">
+                          <button class="btn btn-info btn-lg" type="button" onclick="filter()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-search mb-1" viewBox="0 0 16 16">
+                              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                            </svg>
+                          </button>
+                      </span>
+                  </div>
+              </div>
+          </div>
+              <!-- <div class="pull-right"> -->
+                <button class="btn btn-light mr-2" data-toggle="portfilter" data-target="all">
+                    적합도 순
+                </button>
+                <button class="btn btn-small btn-light" data-toggle="portfilter" data-target="icon">
+                    경력
+                </button>
+            <!-- </div> -->
+        </div>
+      </div>
+    </div>
+
+    <div class="position-list">
+      <div class="container">
+        <div class="row">
+          <% for(i of companies) { %>
+            <div class="col-md-6 clearfix position" data-tag='web' data-company="<%=i.company%>">
+              <div class="picture-list">
+                <% if(tech !== undefined) { %>
+                  <a href="/require/<%=i.positionId%>?data=<%=tech%>">
+                <% }else { %>
+                  <a href="/require/<%=i.positionId%>">
+                <% } %>
+               
+                  <div class="pictures">
+                    <img src="<%=i.logo_src%>">
+                  </div>
+                    <div class="caption">
+                      <h4 class= "caption-position"><%= i.position %></h4>
+                      <p class="caption-company"><%=i.company %></p>
+                      <% let tech_stack = JSON.parse(i.tech_stack) %>
+                      <% for(let j=0; j<tech_stack.length; j++) {%>
+                        <span class="badge badge-light"><%=tech_stack[j]%></span>
+                      <% } %> 
+                    </div>
+                  
+                </a>
+              </div>
+          </div>
+        <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function filter() {
+      let search = document.getElementById('search').value.toUpperCase();
+      let position = document.getElementsByClassName('position');
+
+      for(let i=0; i<position.length; i++) {
+        let company = position[i].dataset.company;
+        
+        if(company.toUpperCase().includes(search)) {
+          console.log(company);
+          position[i].style.display = "flex"
+        }else {
+          position[i].style.display = "none"
+        }
+      }
+      
+    }
+  </script>
+
+</body>
+</html>

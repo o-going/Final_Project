@@ -63,6 +63,8 @@
         </div>
       </div>
 
+
+
       <div class="random">
         <div class="container">
           <div class="row">
@@ -73,18 +75,22 @@
                     <a href="/require/<%=p.positionId%>">
                       <div class="pictures">
                         <img src="<%=p.logo_src%>">
-                      
+                      </div>
                         <div class="caption">
                           <h4><%= p.position %></h4>
                           <p><%=p.company %></p>
+                          <% let tech_stack = JSON.parse(p.tech_stack) %>
+                          <% for(let j=0; j<tech_stack.length; j++) {%>
+                            <span class="badge badge-light"><%=tech_stack[j]%></span>
+                          <% } %> 
                         </div>
-                      </div>
+                      
                     </a>
                   </div>
               <% } %>
             </div>
           </div> 
-    </div>
+      </div>
 
     </div>
     
