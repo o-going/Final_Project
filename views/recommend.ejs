@@ -9,11 +9,138 @@
   <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-  
+
   <link rel="stylesheet" href="css/style.css">
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
   <title>Main</title>
+
+  <script>
+    function filter() {
+      let search = document.getElementById('search').value.toUpperCase();
+      let position = document.getElementsByClassName('position');
+
+      for(let i=0; i<position.length; i++) {
+        let company = position[i].dataset.company;
+        
+        if(company.toUpperCase().includes(search)) {
+          console.log(company);
+          position[i].style.display = "flex"
+        }else {
+          position[i].style.display = "none"
+        }
+      }
+      
+    }
+
+    $('document').ready(function () {
+      //let entire_positions = document.querySelectorAll('.position');
+      
+      $('.dropdown-item').on('click', function(e){
+        // console.log(e)
+        let value = e.target.innerHTML;
+        $('#dropdownMenuButton').html(value);
+
+        let positions = document.querySelectorAll('.position');
+        let display = document.getElementById('display');
+
+        for(let i=0; i<positions.length; i++) {
+          let career = positions[i].dataset.career;
+
+          if(value == '전체'){
+            positions[i].style.display = "flex"
+          }
+          else if(value == '신입') {
+            if(career == '신입') {
+              // display.innerHTML += positions[i].outerHTML;
+              positions[i].style.display = "flex"
+            }else {
+              positions[i].style.display = "none"
+            }
+          }
+          else if(value == '경력 무관') {
+            if(career == '경력 무관') {
+              positions[i].style.display = "flex"
+            }else {
+              positions[i].style.display = "none"
+            }
+          }
+          else {
+            if(career == '신입' || career == '경력 무관') {
+              positions[i].style.display = "none"
+            }else {
+              positions[i].style.display = "flex"
+            }
+          }
+        }
+      })
+
+      let tech_stack = document.querySelectorAll('.position');
+      let myskill = document.getElementById('mySkill').dataset.myskill.split(',');
+      let text = document.querySelectorAll('.caption');
+      // console.log(myskill);
+      let arr = [];
+      for(let i=0; i<tech_stack.length; i++) {
+        let stack = JSON.parse(tech_stack[i].dataset.stack);
+        // console.log(stack);
+        let match = [];
+        for(let j=0; j<stack.length; j++) {
+          for(let k=0; k<myskill.length; k++) {
+            if(stack[j].includes(myskill[k])) {
+              match.push(myskill[k]);
+              break;
+            }
+          }
+        }
+        //console.log(match)
+        let percentage = Math.floor((match.length / stack.length) * 100);
+        let aa = tech_stack[i].querySelector('.match').innerHTML = percentage + '%';
+        let data = tech_stack[i].dataset.percentage = percentage;  
+    }
+  })
+  let count = 0;
+
+  function match() {
+    let entire = [];
+    let first = [];
+    let positions = document.querySelectorAll('.position');
+    let display = document.getElementById('display');
+
+    for(let i=0; i<positions.length; i++) {
+      entire.push(positions[i]);
+      first.push(positions[i]);
+    }
+
+    entire.sort(function(a, b) {
+        if(b.dataset.percentage == a.dataset.percentage) {
+          if(a.dataset.position > b.dataset.position) {
+            return 1;
+          }else {
+            return -1;
+          }
+        }
+        return b.dataset.percentage - a.dataset.percentage;
+    });
+
+    // console.log(entire);
+
+    count++;
+    console.log(count);
+    if(count % 2 == 0) {
+      display.innerHTML = "";
+      for(let a=0; a<first.length; a++) {
+        display.appendChild(first[a]);
+      }
+    }else {
+      display.innerHTML = "";
+      for(let j=0; j<entire.length; j++) {
+        display.appendChild(entire[j]);
+      }
+    }
+  }
+
+  </script>
+
 </head>
 <body>
 <!-- Navigation-->
@@ -40,7 +167,7 @@
         <div class="reco-desc col-12 ml-2">
           <p class="text-center">선택한 기술들에 맞는 구인공고 입니다.</p>
         </div>
-        <div class="select_skill col-12 text-center">
+        <div id="mySkill" class="select_skill col-12 text-center" data-myskill="<%=tech%>">
           <p>선택 기술: <strong><%=tech %></strong></p>
         </div>
       </div>
@@ -63,39 +190,47 @@
                   </div>
               </div>
           </div>
-              <!-- <div class="pull-right"> -->
-                <button class="btn btn-light mr-2" data-toggle="portfilter" data-target="all">
-                    적합도 순
-                </button>
-                <button class="btn btn-small btn-light" data-toggle="portfilter" data-target="icon">
-                    경력
-                </button>
-            <!-- </div> -->
+          
+              <div class="dropdown" id="myDropdown">
+                <button class="btn btn-secondary dropdown-toggle mr-3" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  전체
+                </button>  
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                  <a class="dropdown-item">전체</a>
+                  <a class="dropdown-item" >신입</a>
+                  <a class="dropdown-item" >경력 무관</a>
+                  <a class="dropdown-item" >경력</a>
+                </div>
+              </div>
+
+              <button id="btnPoint" class="btn btn-light" data-toggle="portfilter" data-target="all" onclick="match()">
+                적합도 순
+            </button>    
         </div>
       </div>
     </div>
 
     <div class="position-list">
       <div class="container">
-        <div class="row">
+        <div id="display" class="row">
           <% for(i of companies) { %>
-            <div class="col-md-6 clearfix position" data-tag='web' data-company="<%=i.company%>">
+            <div class="col-md-6 clearfix position" data-position="<%= i.position %>" data-company="<%=i.company%>" data-career="<%=i.career%>" data-stack="<%=i.tech_stack%>" data-percentage="">
               <div class="picture-list">
                 <% if(tech !== undefined) { %>
                   <a href="/require/<%=i.positionId%>?data=<%=tech%>">
                 <% }else { %>
                   <a href="/require/<%=i.positionId%>">
                 <% } %>
-               
+                    
                   <div class="pictures">
                     <img src="<%=i.logo_src%>">
                   </div>
                     <div class="caption">
-                      <h4 class= "caption-position"><%= i.position %></h4>
+                      <h4 class= "caption-position"><%= i.position %><b class="match"></b></h4>
                       <p class="caption-company"><%=i.company %></p>
                       <% let tech_stack = JSON.parse(i.tech_stack) %>
                       <% for(let j=0; j<tech_stack.length; j++) {%>
-                        <span class="badge badge-light"><%=tech_stack[j]%></span>
+                        <span id="techStack" class="badge badge-light"><%=tech_stack[j]%></span>
                       <% } %> 
                     </div>
                   
@@ -107,25 +242,5 @@
       </div>
     </div>
   </div>
-
-  <script>
-    function filter() {
-      let search = document.getElementById('search').value.toUpperCase();
-      let position = document.getElementsByClassName('position');
-
-      for(let i=0; i<position.length; i++) {
-        let company = position[i].dataset.company;
-        
-        if(company.toUpperCase().includes(search)) {
-          console.log(company);
-          position[i].style.display = "flex"
-        }else {
-          position[i].style.display = "none"
-        }
-      }
-      
-    }
-  </script>
-
 </body>
 </html>

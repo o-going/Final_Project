@@ -369,7 +369,7 @@ router.get('/recommend', async(req, res) => {  // 얻어온 data
 
   try {
     let query = "SELECT "
-    query += "positions.position,companies.logo_src,companies.company,positions.positionId,positions.tech_stack "
+    query += "positions.position,companies.logo_src,companies.company,positions.positionId,positions.tech_stack,positions.career "
     query += "from companies JOIN positions ON companies.companyId = positions.companyId WHERE "
     query += `positions.tech_stack LIKE '%"${tech[0]}"%' `
     for(i=1; i<tech.length; i++) {
@@ -388,7 +388,7 @@ router.get('/recommend', async(req, res) => {  // 얻어온 data
   }else {
       try {
     var query = "SELECT "
-    query += "positions.position,companies.logo_src,companies.company,positions.positionId,positions.tech_stack "
+    query += "positions.position,companies.logo_src,companies.company,positions.positionId,positions.tech_stack,positions.career "
     query += "from companies JOIN positions ON companies.companyId = positions.companyId order by rand() LIMIT 8"
     var [random, _]= await con.query(query);
   }catch(err) {

@@ -18,7 +18,6 @@
    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
 
-
    <link rel="stylesheet" href="/css/style.css">
    <link rel="stylesheet" href='/css/progressbar.css'>
    <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -48,11 +47,44 @@
       console.log(reqText.search(tech))
       if (reqText.search(tech) != -1) {
         reqText = reqText.replace(tech, `<b style="color:red;">${tech}</b>`)
+        reqText = reqText.toUpperCase();
       }
     }
     document.getElementById('requirement').innerHTML = reqText;
-  })
 
+    let match = [];
+    let tech_stack = JSON.parse(document.getElementById('techStack').dataset.stack);
+    for(let i=0; i<tech_stack.length; i++) {
+      for(let j=0; j<techs.length; j++) {
+      if(tech_stack[i].includes(techs[j])) {
+        match.push(techs[j])
+      }
+      }
+    }
+    console.log(match)
+
+    let percentage = Math.floor((match.length / tech_stack.length) * 100);
+    document.getElementById('percentage').innerHTML = percentage + ' %';
+    document.getElementById('progress').dataset.percentage = percentage;
+    console.log(percentage)
+
+    // let postFetch = () => {
+    //       fetch("/recommend", {
+    //         method: "POST",
+    //         headers: {
+    //           "Content-type": "application/json; charset=UTF-8"
+    //         },
+    //         body: JSON.stringify(percentage)
+    //       })
+    //       .then(response => response.json())
+    //       .then(json => {
+    //         console.log(json)
+    //         // let resultHtml = document.querySelector('#position_percentage');
+    //         // resultHtml.innerHTML = "POST Fetch <br />" + JSON.stringify(json)
+    //       })
+    //     }
+
+  })
 </script>
 <body>
   <nav id="menu" class="navbar navbar-default navbar-fixed-top">
@@ -85,7 +117,7 @@
             </div>
             <hr class="col-12">
 
-            <div class="tech_stack col-12">
+            <div class="tech_stack col-12" id="techStack" data-stack="<%=position_info.tech_stack%>">
               <h5>기술 스택</h5>
               <% let tech_stack = JSON.parse(position_info.tech_stack) %>
               <% for(let i=0; i<tech_stack.length; i++) {%>
@@ -111,7 +143,7 @@
             <div class="row">
               <% if(tech !== undefined) { %>
                 <div class="container p-5">
-                  <div class="progress" data-percentage="74">
+                  <div class="progress" id="progress" data-percentage="">
                     <span class="progress-left">
                       <span class="progress-bar"></span>
                     </span>
@@ -120,8 +152,9 @@
                     </span>
                     <div class="progress-value">
                       <div>
-                        74%<br>
-                        <span>Matching</span>
+                        <p id="percentage"></p>
+                        <br>
+                        <strong>Matching</strong>
                       </div>
                     </div>
                   </div>
