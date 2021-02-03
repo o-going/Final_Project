@@ -52,22 +52,42 @@
   </button>
 
   <script type="text/javascript">
-
+  window.addEventListener("load", function() {
+    if(window.sessionStorage.getItem('data') != null) {
+      console.log('aa');
+      techs = JSON.parse(window.sessionStorage.getItem('data'))
+      for (t of techs) {
+        var paths = searchTree(root, t, []);
+        if(typeof(paths) !== "undefined"){
+          openPaths(paths);
+          console.log('path')
+          console.log(paths);
+        }
+        else{
+          alert(t +" not found!");
+        }
+      }
+    }
+  })
     function recommend() {  // click 했을 떄 event 함수
       let save = [];
       let save2 = [];
       search_select_node(root, save)
       for(i of save) {
         save2.push(i.name); //save 객체의 name만 뽑아서 push
+        
       }
       console.log(save2);
       console.log(save);
       //fetch("/recommend2?data="+JSON.stringify(save2))
+      sessionStorage.setItem('data', JSON.stringify(save2));
+      // let data = JSON.parse(sessionStorage.getItem('item'));
+
       window.location = "/recommend?data="+encodeURIComponent(JSON.stringify(save2)) // window.location으로 주소로 data를 문자열로 보내줌
     }
 
     //basically a way to get the path to an object
-    function searchTree(obj,search,path){
+    function searchTree(obj,search,path) {
       if(obj.name === search){ //if search is found return, add the object to the path and return it
         path.push(obj);
         return path;
@@ -91,7 +111,7 @@
       
     }
 
-    function search_select_node(obj, path){ 
+    function search_select_node(obj, path) { 
       let root = "Programming Language";
       if(obj.children || obj._children){ //if children are collapsed d3 object will have them instantiated as _children
         var children = (obj.children) ? obj.children : obj._children; // children이 펴져있는 애들이면 children, 접혀있는 애들이면 _children
@@ -109,7 +129,7 @@
           // path.push(obj); // path에 해당 children을 넣어줌
         }
       }else {
-        if(obj.class == 'found'){
+        if(obj.class == 'found') {
           if(obj.name != root) {
             path.push(obj); // 만약 class가 found면 path에 해당 children을 넣어줌
           }
@@ -211,11 +231,13 @@
         containerCssClass: "search"
       });
     });
-    //attach search box listener
+
+    // attach search box listener
     $("#search").on("select2-selecting", function(e) {
       var paths = searchTree(root,e.object.text,[]);
       if(typeof(paths) !== "undefined"){
         openPaths(paths);
+        console.log('path')
         console.log(paths);
       }
       else{

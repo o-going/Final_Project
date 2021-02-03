@@ -411,7 +411,7 @@ router.get('/require/:id', async (req, res) => {
   // try{
     // let positionInfo = await con.query('SELECT `positionId`, `position`,`position_Info`,`requirement`,`preference` FROM final.positions WHERE positionId='+id);
     let query = "SELECT "
-    query += "positionId, companies.company, positions.position, positions.position_Info, positions.requirement, positions.preference, positions.tech_stack "
+    query += "positionId, companies.company, companies.location, positions.position, positions.position_Info, positions.requirement, positions.preference, positions.tech_stack "
     query += "FROM positions JOIN companies ON positions.companyId = companies.companyId WHERE positionId="+id
     // WHERE positionId="+id
     let positionInfo = await con.query(query)
