@@ -21,7 +21,35 @@
    <link rel="stylesheet" href="css/style.css">
    <link rel="stylesheet" href="css/techtree.css">
    <link rel="preconnect" href="https://fonts.gstatic.com">
-   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">   
+  
+   <style>
+     body {
+       text-align: center;
+     }
+
+     svg {
+       margin-top: 55px;
+       border: 1px solid #aaa;
+     }
+
+     .node rect {
+       fill: #fff;
+       stroke: steelblue;
+       stroke-width: 1px;
+     }
+
+     .node text{
+       font: 13px sans-serif;
+     }
+
+     .link {
+      fill: none;
+      stroke: #ccc;
+      stroke-width: 1.5px;
+    }
+   </style>
+
    <title>Document</title>
 </head>
 <body>
@@ -50,6 +78,12 @@
   <button class="btn btn-primary ml-5" data-toggle="portfilter" data-target="all" onclick="recommend()">  <!--click 했을 때 event-->
     다음
   </button>
+  <button class="btn btn-secondary ml-5" data-toggle="portfilter" data-target="all" onclick="saveData()">  <!--click 했을 때 event-->
+    저장
+  </button>
+  <button class="btn btn-light ml-5" data-toggle="portfilter" data-target="all" onclick="refresh()">
+    초기화
+  </button>
 
   <script type="text/javascript">
   window.addEventListener("load", function() {
@@ -58,9 +92,8 @@
       techs = JSON.parse(window.sessionStorage.getItem('data'))
       for (t of techs) {
         var paths = searchTree(root, t, []);
-        if(typeof(paths) !== "undefined"){
+        if(typeof(paths) !== "undefined") {
           openPaths(paths);
-          console.log('path')
           console.log(paths);
         }
         else{
@@ -69,6 +102,7 @@
       }
     }
   })
+
     function recommend() {  // click 했을 떄 event 함수
       let save = [];
       let save2 = [];
@@ -84,6 +118,39 @@
       // let data = JSON.parse(sessionStorage.getItem('item'));
 
       window.location = "/recommend?data="+encodeURIComponent(JSON.stringify(save2)) // window.location으로 주소로 data를 문자열로 보내줌
+    }
+
+    function refresh() {
+      sessionStorage.removeItem('data');
+      window.location.reload();
+    }
+
+    function saveData() {
+      let save = [];
+      let save2 = [];
+      search_select_node(root, save)
+      for(i of save) {
+        save2.push(i.name); //save 객체의 name만 뽑아서 push
+        
+      }
+      console.log(save2);
+
+      $.ajax({
+        url: '/techtree',
+        method: 'GET',
+        headers: {
+          "Content-type": "application/json; charset=UTF-8"
+        },
+        data: JSON.stringify({
+          data: save2
+        }),
+        success: function(response) {
+          alert('OK!')
+        },
+        error: function(err) {
+          alert('fail!')
+        }
+      });
     }
 
     //basically a way to get the path to an object
@@ -148,15 +215,23 @@
             }
             return [index,leaves];
     }
-  
+    
+    let zoom = d3.behavior.zoom()
+      .scaleExtent([.1,1])
+      .on('zoom', function() {
+        svg.attr('transform', 'translate(' + d3.event.translate + ') scale(' + d3.event.scale + ')');
+      })
+      .translate([150,200]);
+
+
     var div = d3.select("body")
       .append("div") // declare the tooltip div
       .attr("class", "tooltip")
       .style("opacity", 0);
   
-    var margin = {top: 50, right: 200, bottom: 20, left: 250},
-      width = 960 - margin.right - margin.left,
-      height = 800 - margin.top - margin.bottom;
+    var margin = {top: 700, right: 200, bottom: 0, left: 250},
+      width = 1500 - margin.right - margin.left,
+      height = 1400 - margin.top - margin.bottom;
   
     var i = 0,
       duration = 750,
@@ -166,16 +241,27 @@
     var diameter = 960;
   
     var tree = d3.layout.tree()
-      .size([height, width]);
+      // .size([height, width])
+      .nodeSize([60, 100])
+      .separation(function() {
+        return .6;
+      })
   
     var diagonal = d3.svg.diagonal()
       .projection(function(d) { return [d.y, d.x]; });
-  
+    
+    let boxWidth = 150,
+        boxHeight = 40;
+
     var svg = d3.select("body").append("svg")
       .attr("width", width + margin.right + margin.left)
       .attr("height", height + margin.top + margin.bottom)
+      // .attr('width', 1500)
+      // .attr('height', 800)
       .append("g")
+      // .call(zoom)
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+      // .attr('transform', 'translate(150,200)');
   
     //recursively collapse children
     function collapse(d) {
@@ -219,17 +305,23 @@
     }
   
     d3.json("js/data.json", function(error,values){
+      if(error) {
+        return console.error(error);
+      }
+
       root = values;
       select2_data = extract_select2_data(values,[],0)[1];
+
       root.x0 = height / 2;
+      // root.x0 = 0;
       root.y0 = 0;
       root.children.forEach(collapse);
       update(root);
       //init search box
-      $("#search").select2({
-        data: select2_data,
-        containerCssClass: "search"
-      });
+      // $("#search").select2({
+      //   data: select2_data,
+      //   containerCssClass: "search"
+      // });
     });
 
     // attach search box listener
@@ -253,7 +345,7 @@
       links = tree.links(nodes);
   
       // Normalize for fixed-depth.
-      nodes.forEach(function(d) { d.y = d.depth * 180; });
+      nodes.forEach(function(d) { d.y = d.depth * 150; });
   
       // Update the nodesâ€¦
       var node = svg.selectAll("g.node")
@@ -262,19 +354,41 @@
       // Enter any new nodes at the parent's previous position.
       var nodeEnter = node.enter().append("g")
       .attr("class", "node")
-      .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
+      // .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
+      .attr('transform', function(d) {
+        return 'translate(' + (source.x0 + boxWidth/2) + ',' + source.y0 + ')';
+      })
       .on("click", click);
+      // .on('click', togglePerson);
   
       nodeEnter.append("circle")
       .attr("r", 1e-6)
+      .attr('class', 'circle')
       .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
-  
+
+      // nodeEnter.append('rect')
+      //   .attr({
+      //     x: 0,
+      //     y: 0,
+      //     width: 0,
+      //     height: 0
+      //   });
+
       nodeEnter.append("text")
-        .attr("x", function(d) { return d.children || d._children ? -10 : 10; })
+        .attr("dx", function(d) { return d.children || d._children ? -10 : 10; })
         .attr("dy", ".35em")
+        .attr('class', 'name')
         .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
         .text(function(d) { return d.name; })
         .style("fill-opacity", 1e-6);
+        // .attr('dx', 5)
+        // .attr('dy', -50)
+        // .attr('text-anchor', 'start')
+        // .attr('class', 'name')
+        // .text(function(d) {
+        //   return d.name;
+        // })
+        // .style('fill-opacity', 0);
   
       // Transition nodes to their new position.
       var nodeUpdate = node.transition()
@@ -299,21 +413,61 @@
             return "#ff4136"; //red
           }
       });
-  
+
+      // nodeUpdate.select('rect')
+      //   .attr({
+      //     x: -(boxWidth/2),
+      //     y: -(boxWidth/2),
+      //     width: boxWidth,
+      //     height: boxHeight
+      //   })
+      //   .style('fill', function(d) {
+      //     if(d.class === 'found') {
+      //       return '#549BD6';
+      //     }else if(d._children) {
+      //       return 'lightsteelblud';
+      //     }else {
+      //       return '#fff';
+      //     }
+      //   })
+      //   .style('stroke', function(d) {
+      //     if(d.class === 'found') {
+      //       return '#549BD6';
+      //     }
+      //   });
+        
       nodeUpdate.select("text")
         .style("fill-opacity", 1);
+      // nodeUpdate.select('text')
+      //   .attr('dx', -(boxWidth/2) + 5)
+      //   .style('fill-opacity', 1);
   
       // Transition exiting nodes to the parent's new position.
       var nodeExit = node.exit().transition()
         .duration(duration)
-        .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
+        .attr("transform", function(d) { return "translate(" + source.x + "," + source.y + ")"; })
         .remove();
   
       nodeExit.select("circle")
-        .attr("r", 1e-6);
+        .attr("r", 1e-2);
+      // nodeExit.select('rect')
+      //   .attr({
+      //     x: 0,
+      //     y: 0,
+      //     width: 0,
+      //     height: 0
+      //   });
   
       nodeExit.select("text")
         .style("fill-opacity", 1e-6);
+      // nodeExit.select('text')
+      //   .style('fill-opacity', 0)
+      //   .attr('dy', 0);
+        
+      nodes.forEach(function(d) {
+        d.x0 = d.x;
+        d.y0 = d.y;
+      })
   
       // Update the linksâ€¦
       var link = svg.selectAll("path.link")
@@ -326,6 +480,12 @@
           var o = {x: source.x0, y: source.y0};
           return diagonal({source: o, target: o});
         });
+      // link.enter().append('path')
+      //   .attr('class', 'link')
+      //   .attr('d', function(d) {
+      //     let o = {x: source.x0, y: (source.y0 + boxWidth/2)};
+      //     return transitionElbow({source: o, target: o});
+      //   });
   
       // Transition links to their new position.
       link.transition()
@@ -336,13 +496,24 @@
             return "#ff4136";
           }
         });
+      // link.transition()
+      //   .duration(duration)
+      //   .attr('d', diagonal)
+      //   .style('stroke', function(d) {
+      //     if(d.target.class === 'found') {
+      //       return '#ff4136';
+      //     }
+      //   })
+      //   .attr('d', elbow);
   
       // Transition exiting nodes to the parent's new position.
       link.exit().transition()
         .duration(duration)
         .attr("d", function(d) {
           var o = {x: source.x, y: source.y};
+          // let o = {x: source.x, y: (source.y + boxWidth/2)};
           return diagonal({source: o, target: o});
+          // return transitionElbow({source: o, target: o});
         })
         .remove();
   
@@ -352,6 +523,26 @@
         d.y0 = d.y;
         });
     }
+
+    function elbow(d) {
+        var sourceX = d.source.x,
+            sourceY = d.source.y + (boxWidth / 2),
+            targetX = d.target.x,
+            targetY = d.target.y - (boxWidth / 2);
+
+        return "M" + sourceY + "," + sourceX
+          + "H" + (sourceY + (targetY-sourceY)/2)
+          + "V" + targetX 
+          + "H" + targetY;
+      }
+
+    function transitionElbow(d){
+        return "M" + d.source.x + "," + d.source.x
+          + "H" + d.source.y
+          + "V" + d.source.x 
+          + "H" + d.source.y;
+    }
+
   </script>
 
 

@@ -42,7 +42,7 @@ router.post('/login', async(req, res) => {
       res.send('<script type="text/javascript">alert("잘못된 email 혹은 비밀번호입니다.");location.href="/login";</script>');
       return;
     }
-    else{
+    else {
       console.log(user);
       req.session._id = user.id;
       req.session.email = user.email;
@@ -78,8 +78,22 @@ router.post('/signup', async(req, res) => {
 
 router.get('/techtree', async (req, res) => {
   res.render('techtree', {
-    reco: reco_data
+    // reco: reco_data
   });
+  if(req.session.email == null) {
+    res.render('login');
+  }
+});
+
+router.post('/techtree/:data', async(req, res) => {
+  let data = req.params.data;
+  if(req.session.email == null) {
+    // res.send('<script type="text/javascript">alert("로그인 후 이용하세요.");location.href="http://localhost:3000/login";</script>')
+    // res.render('login')
+    res.redirect('/login')
+  }
+  // let data = req.body.data;
+  console.log(data);
 });
 
 let dataset_nodes;
