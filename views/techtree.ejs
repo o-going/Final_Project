@@ -17,6 +17,8 @@
    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
+   <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
 
    <link rel="stylesheet" href="css/style.css">
    <link rel="stylesheet" href="css/techtree.css">
@@ -58,12 +60,17 @@
     <div class="container"> 
       <!-- Brand and toggle get grouped for better mobile display -->
       <div class="navbar-header">
-        <a class="navbar-brand page-scroll" href="/">Logo</a> 
+        <a class="navbar-brand page-scroll" href="/">TecTrees</a> 
       </div>
       <div class="navbar-brand" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav navbar-right">
           <li><a href="techtree" class="page-scroll">TechTree</a></li>
-          <li><a href="Login" class="page-scroll">Login</a></li>
+          <% if(email == null) { %>
+            <li class="login"><a href="Login" class="page-scroll">Login</a></li>
+          <% }else { %>
+            <li id="username" data-email="<%=email%>"><a><%=name%>님</a></li>
+            <li class="logout"><a href="Logout" class="page-scroll">Logout</a></li>
+          <% } %>
         </ul>
       </div>
     </div>
@@ -75,18 +82,35 @@
 
   <!-- <div id="search">
   </div> -->
-  <button class="btn btn-primary ml-5" data-toggle="portfilter" data-target="all" onclick="recommend()">  <!--click 했을 때 event-->
+  <button class="btn btn-primary ml-5 mt-5" data-toggle="portfilter" data-target="all" onclick="recommend()">  <!--click 했을 때 event-->
     다음
   </button>
-  <button class="btn btn-secondary ml-5" data-toggle="portfilter" data-target="all" onclick="saveData()">  <!--click 했을 때 event-->
+  <button class="btn btn-secondary ml-5 mt-5" data-toggle="portfilter" data-target="all" onclick="saveData()">  <!--click 했을 때 event-->
     저장
   </button>
-  <button class="btn btn-light ml-5" data-toggle="portfilter" data-target="all" onclick="refresh()">
+  <button class="btn btn-light ml-5 mt-5" data-toggle="portfilter" data-target="all" onclick="refresh()">
     초기화
   </button>
+  <div>
+    <% for(let i=0; i<user.length; i++) { %>
+      <div id='techtreedata' data-techtree="<%=user[i].techtreedata%>" style="display: none;"></div>
+    <% } %>
+  </div>
 
   <script type="text/javascript">
   window.addEventListener("load", function() {
+    let data = document.getElementById('techtreedata').dataset.techtree;
+    let email = document.getElementById('username').dataset.email;
+    console.log(email);
+    console.log(data);
+    console.log(typeof(data));
+    
+    if(email != null) {
+      let data2 = data.split(',');
+      console.log(data2);
+      sessionStorage.setItem('data', JSON.stringify(data2));
+    }
+
     if(window.sessionStorage.getItem('data') != null) {
       console.log('aa');
       techs = JSON.parse(window.sessionStorage.getItem('data'))
@@ -125,19 +149,26 @@
       window.location.reload();
     }
 
+    function gotologin() {
+      location.replace('/login');
+    }
+
+    function timer() {
+      setTimeout('gotologin()', 1500);
+    }
+
     function saveData() {
       let save = [];
       let save2 = [];
       search_select_node(root, save)
       for(i of save) {
         save2.push(i.name); //save 객체의 name만 뽑아서 push
-        
       }
       console.log(save2);
 
       $.ajax({
         url: '/techtree',
-        method: 'GET',
+        method: 'POST',
         headers: {
           "Content-type": "application/json; charset=UTF-8"
         },
@@ -145,7 +176,30 @@
           data: save2
         }),
         success: function(response) {
-          alert('OK!')
+          // 저장되었습니다 팝업 추가하기 !
+          if(response == false) {
+            console.log(response);
+            // alert('로그인 후 이용하세요.');
+            Swal.fire({
+             position: 'center',
+             icon: 'error',
+             title: '로그인 후 이용하세요.',
+             showConfirmButton: false,
+             timer: 1500
+            })
+            timer()
+            // window.location = "/login";
+          }else{
+            console.log(response);
+            // alert('save!');
+            Swal.fire({
+             position: 'center',
+             icon: 'success',
+             title: '저장되었습니다.',
+             showConfirmButton: false,
+             timer: 1500
+            })
+          }
         },
         error: function(err) {
           alert('fail!')

@@ -7,6 +7,8 @@ const router = express.Router();
 const mysql = require('mysql2/promise');
 const { captureRejectionSymbol } = require('events');
 const { group } = require('console');
+const session = require('express-session');
+const { NotImplemented } = require('http-errors');
 
 let con;
 async function init() {
@@ -32,7 +34,7 @@ router.post('/login', async(req, res) => {
   let user;
 
   try{
-    let [users, fileds] = await con.query(`SELECT * FROM \`users\`WHERE email = '${body.email}' AND password = '${body.password}'`);
+    let [users, fields] = await con.query(`SELECT * FROM \`users\`WHERE email = '${body.email}' AND password = '${body.password}'`);
     console.log('확인');
     console.log(users);
     if(users.length > 0) {
@@ -57,6 +59,15 @@ router.post('/login', async(req, res) => {
   }
 });
 
+router.get('/logout', (req, res) => {
+  if(req.session.email != null) {
+    req.session.destroy(function() {
+      req.session;
+    });
+  }
+  res.render('logout');
+})
+
 router.get('/signup', (req, res) => {
   res.render('signup');
 });
@@ -76,24 +87,48 @@ router.post('/signup', async(req, res) => {
   res.send('<script type="text/javascript">alert("회원가입에 성공하셨습니다.");location.href="/login";</script>');
 });
 
-router.get('/techtree', async (req, res) => {
-  res.render('techtree', {
-    // reco: reco_data
+router.get('/profile', async(req, res) => {
+  res.render('profile', {
+    email: req.session.email,
+    name: req.session.name
   });
-  if(req.session.email == null) {
-    res.render('login');
+});
+
+router.get('/techtree', async (req, res) => {
+  try{
+    let email = req.session.email;
+    let sql = `SELECT * FROM users WHERE email='${email}'`;
+    console.log(email);
+    console.log(sql);
+    let [user, _] = await con.query(sql);
+    console.log(user);
+    res.render('techtree', {
+      // reco: reco_data
+      email: email,
+      name: req.session.name,
+      user: user
+    });
+  }catch(err) {
+    console.log(err);
   }
 });
 
-router.post('/techtree/:data', async(req, res) => {
-  let data = req.params.data;
-  if(req.session.email == null) {
-    // res.send('<script type="text/javascript">alert("로그인 후 이용하세요.");location.href="http://localhost:3000/login";</script>')
-    // res.render('login')
-    res.redirect('/login')
+router.post('/techtree', async(req, res) => {
+  try{
+    if(req.session.email == null) {
+      res.send(false);
+    }else{
+      let email = req.session.email;
+      let data = req.body.data;
+      let sql = `UPDATE users SET techtreedata='${data}' WHERE email='${email}'`
+      console.log(data);
+      console.log(sql);
+      await con.query(sql);
+      res.send(true);
+    };
+  }catch(err) {
+    console.log(err);
   }
-  // let data = req.body.data;
-  console.log(data);
 });
 
 let dataset_nodes;
@@ -105,7 +140,7 @@ async function get_dataset() {
   let query = 'SELECT '
       query += 'companies.companyId, companies.company, companies.logo_src, positions.positionId, positions.position, positions.position_category, positions.tech_stack '
       query += 'FROM companies JOIN positions ON companies.companyId = positions.companyId'
-  let [skill, _] = await con.query(query);  
+  let [skill, _] = await con.query(query); 
   // console.log(skill)
 
   graph = {};
@@ -387,29 +422,32 @@ router.get('/recommend', async(req, res) => {  // 얻어온 data
     query += "from companies JOIN positions ON companies.companyId = positions.companyId WHERE "
     query += `positions.tech_stack LIKE '%"${tech[0]}"%' `
     for(i=1; i<tech.length; i++) {
-      query += `OR positions.tech_stack LIKE '%"${tech[i]}"%' ` // tech[i]인 data만 가져옴 AND => 다 속하는 거 OR => 속한거 다
+      query += `OR positions.tech_stack LIKE '%"${tech[i]}"%'` // tech[i]인 data만 가져옴 AND => 다 속하는 거 OR => 속한거 다
     }
-    var [random, _]= await con.query(query);  // random 함수에 query를 넣음
+    let [random, _]= await con.query(query);  // random 함수에 query를 넣음
+
+    res.render('recommend', {
+      email: req.session.email,
+      companies: random,
+      tech: tech
+    });
+
   }catch(err) {
     console.log(err);
   }
-
-  res.render('recommend', {
-    companies: random,
-    tech: tech
-  });
 
   }else {
       try {
     var query = "SELECT "
     query += "positions.position,companies.logo_src,companies.company,positions.positionId,positions.tech_stack,positions.career "
-    query += "from companies JOIN positions ON companies.companyId = positions.companyId order by rand() LIMIT 8"
+    query += "from companies JOIN positions ON companies.companyId = positions.companyId"
     var [random, _]= await con.query(query);
   }catch(err) {
     console.log(err);
   }
 
   res.render('recommend', {
+    email: req.session.email,
     companies: random,
     tech: undefined
   });
@@ -451,6 +489,7 @@ router.get('/require/:id', async (req, res) => {
 
   // }
   res.render('require', {
+    email: req.session.email,
     id : req.params.id ,
     position_info: positionInfo[0][0],
     tech: data
@@ -459,20 +498,114 @@ router.get('/require/:id', async (req, res) => {
 });
 
 router.get('/', async (req, res) => {  
-  try{
+  // try{
     // var[logos, column] = await con.query ( 'SELECT `companyId`,`logo_src` FROM final.companies' );
-    var query = "SELECT "
+    // let query = "SELECT "
+    //     query += "positions.position,companies.logo_src,companies.company,positions.positionId,positions.tech_stack "
+    //     query += "from companies JOIN positions ON companies.companyId = positions.companyId order by rand() LIMIT 6"
+    // let [random, _]= await con.query(query);
+    // // console.log(random)
+
+    // let email = req.session.email;
+    // let sql = `SELECT * FROM users WHERE email='${email}'`;
+    // let [user, col] = await con.query(sql);
+
+    // let usertech;
+    // for(let i=0; i<user.length; i++) {
+    //   usertech = user[i].techtreedata.split(',');
+    // }
+
+    // res.render('main.ejs', {
+    //   companyRandom: random,
+    //   email: req.session.email,
+    //   name: req.session.name,
+    //   user: user
+    // });
+    let email = req.session.email;
+    if(req.session.email != null) {
+      try{
+        let sql = `SELECT * FROM users WHERE email='${email}'`;
+        let [user, col] = await con.query(sql);
+
+        let usertech;
+        for(let i=0; i<user.length; i++) {
+          usertech = user[i].techtreedata.split(',');
+        }
+        console.log(usertech);
+
+        let query = "SELECT "
+            query += "positions.position,companies.logo_src,companies.company,positions.positionId,positions.tech_stack,positions.career "
+            query += "from companies JOIN positions ON companies.companyId = positions.companyId WHERE "
+            query += `positions.tech_stack LIKE '%"${usertech[0]}"%' `
+            for(i=1; i<usertech.length; i++) {
+              query += `OR positions.tech_stack LIKE '%"${usertech[i]}"%'` // tech[i]인 data만 가져옴 AND => 다 속하는 거 OR => 속한거 다
+            }
+        let [random, _] = await con.query(query);
+
+        res.render('main.ejs', {
+            companyRandom: random,
+            email: req.session.email,
+            name: req.session.name,
+            user: user,
+            usertech: usertech
+          });
+      }catch(err) {
+        console.log(err);
+      }
+    }else {
+      try{
+        let query = "SELECT " // order by rand() LIMIT 6
         query += "positions.position,companies.logo_src,companies.company,positions.positionId,positions.tech_stack "
-        query += "from companies JOIN positions ON companies.companyId = positions.companyId order by rand() LIMIT 6"
-    var [random, _]= await con.query(query);
-    // console.log(random)
-    
-  }catch(err) {
-    console.log(err)
-  }
-  res.render('main.ejs', {
-    companyRandom: random
-  });
+        query += "from companies JOIN positions ON companies.companyId = positions.companyId"
+        let [random, _]= await con.query(query);
+          // console.log(random)
+
+        res.render('main.ejs', {
+          companyRandom: random,
+          email: req.session.email,
+          name: req.session.name,
+        });
+      }catch(err) {
+        console.log(err);
+      }
+    }
+  // }catch(err) {
+  //   console.log(err)
+  // }
+  // if(req.session.email != null) {
+  //   try {
+
+  //   }
+  // }
 });
+
+// router.get('/', async(req, res) => {
+//   let pageNum = Number(req.query.pageNum) || 1; // 쿼리 스트링으로 받을 값, 기본값 1
+//   let contentSize = 10; // 페이지에서 보여줄 컨텐츠 개수
+//   let pnSize = 10; // 페이지네이션 개수 설정 -> 밑에 bar
+//   let skipSize = (pageNum - 1) * contentSize; // 다음 페이지 이동시 건너뛸 리스트 개수
+
+//   con.query("SELECT COUNT(*) as a from companies JOIN positions ON companies.companyId = positions.companyId", (countQueryErr, countQueryResult) => {
+//     if(countQueryErr) throw countQueryErr;
+//     let totalCount = Number(countQueryResult[0].count); // 전체 글 개수
+//     let pnTotal = Math.ceil(totalCount / contentSize) // 페이지네이션의 전체 카운트
+//     let pnStart = ((Math.ceil(pageNum / pnSize) - 1) * pnSize) + 1  // 현재 페이지의 페이지네이션 시작 번호
+//     let pnEnd = (pnStart + pnSize) - 1;  // 현재 페이지의 페이지네이션 끝 번호
+//     con.query("SELECT positions.position,companies.logo_src,companies.company,positions.positionId,positions.tech_stack from companies JOIN positions ON companies.companyId = positions.companyId ORDER BY id DESC LIMIT ?, ?", [skipSize, contentSize], (contentQueryErr, contentQueryResult) => {
+//       if(contentQueryErr) throw contentQueryErr;
+//       if(pnEnd > pnTotal) pnEnd = pnTotal // 페이지네이션의 끝 번호가 페이지네이션 전체 카운트보다 높을 경우
+//       let result = {
+//         pageNum,
+//         pnStart,
+//         pnEnd,
+//         pnTotal,
+//         contents: contentQueryResult,
+//       };
+//       res.render('main', {
+//         articles: result,
+//       });
+//     });
+//     });
+//   }); 
 
 module.exports = router;

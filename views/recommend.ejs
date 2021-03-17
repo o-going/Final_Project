@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
-  <title>Main</title>
+  <title>recommend</title>
 
   <script>
     function filter() {
@@ -30,9 +30,40 @@
           position[i].style.display = "none"
         }
       }
+
+    //   let page = document.querySelector('#display');
+    // let child = page.children;
+    // let totalPost = child.length;  // 전체 posts 개수
+    // let pageBar = Math.ceil(totalPost / posts);
+    // console.log(pageBar);
+
+    // console.log(child);
+    // console.log(totalPost);
+
+    // for(let i=0; i<child.length; i++) {
+    //   child[i].style.display = "none";
+    // }
+
+    // for(j=(pageNum-1)*posts; j<pageNum*posts; j++) {
+    //   console.log(child[j]);
+    //   child[j].style.display = "flex";
+    // }
+
+    // // <li class="page-item"><a class="page-link" href="#">1</a></li>
+    // let pagination = document.getElementById('pagination');
+    // console.log(pagination);
+    // pagination.innerHTML = "";
+    // for(let k=1; k<=pageBar; k++) {
+    //   pagination.innerHTML += `<li class="page-item" id="page-item"><a class="page-link" href="#" onclick="move(${k})">${k}</a></li>`;
+    //   if(k == 1) {
+    //     break;
+    //   }
+    // }
       
     }
 
+    let pageNum = 1;
+    let posts = 6;
     $('document').ready(function () {
       //let entire_positions = document.querySelectorAll('.position');
       
@@ -97,7 +128,62 @@
         let aa = tech_stack[i].querySelector('.match').innerHTML = percentage + '%';
         let data = tech_stack[i].dataset.percentage = percentage;  
     }
+
+    let page = document.querySelector('#display');
+    let child = page.children;
+    let totalPost = child.length;  // 전체 posts 개수
+    let pageBar = Math.ceil(totalPost / posts);
+    console.log(pageBar);
+
+    console.log(child);
+    console.log(totalPost);
+
+    for(let i=0; i<child.length; i++) {
+      child[i].style.display = "none";
+    }
+
+    for(j=(pageNum-1)*posts; j<pageNum*posts; j++) {
+      console.log(child[j]);
+      child[j].style.display = "flex";
+    }
+
+    // <li class="page-item"><a class="page-link" href="#">1</a></li>
+    let pagination = document.getElementById('pagination');
+    console.log(pagination);
+    for(let k=1; k<=pageBar; k++) {
+      pagination.innerHTML += `<li class="page-item" id="page-item"><a class="page-link" href="#" onclick="move(${k})">${k}</a></li>`;
+      if(k == 20) {
+        break;
+      }
+    }
+
   })
+
+  function move(newPageNum) {
+    console.log('aa');
+    console.log(newPageNum);
+
+    let page = document.querySelector('#display');
+    let child = page.children;
+    let pagination = document.getElementById('pagination');
+    let item = document.getElementById('page-item');
+
+    // item.classList.add('active');
+
+    for(j=(pageNum-1)*posts; j<Math.min(pageNum*posts, child.length); j++) {
+      console.log(child[j]);
+      child[j].style.display = "none";
+    }
+    
+    pageNum = newPageNum;
+
+    for(j=(pageNum-1)*posts; j<Math.min(pageNum*posts, child.length); j++) {
+      console.log(child[j]);
+      child[j].style.display = "flex";
+      item.classList.add('active');
+    }
+  }
+
   let count = 0;
 
   function match() {
@@ -137,6 +223,35 @@
         display.appendChild(entire[j]);
       }
     }
+
+    let page = document.querySelector('#display');
+    let child = page.children;
+    let totalPost = child.length;  // 전체 posts 개수
+    let pageBar = Math.ceil(totalPost / posts);
+    console.log(pageBar);
+
+    console.log(child);
+    console.log(totalPost);
+
+    for(let i=0; i<child.length; i++) {
+      child[i].style.display = "none";
+    }
+
+    for(j=(pageNum-1)*posts; j<pageNum*posts; j++) {
+      console.log(child[j]);
+      child[j].style.display = "flex";
+    }
+
+    // <li class="page-item"><a class="page-link" href="#">1</a></li>
+    let pagination = document.getElementById('pagination');
+    console.log(pagination);
+    pagination.innerHTML = "";
+    for(let k=1; k<=pageBar; k++) {
+      pagination.innerHTML += `<li class="page-item" id="page-item"><a class="page-link" href="#" onclick="move(${k})">${k}</a></li>`;
+      if(k == 20) {
+        break;
+      }
+    }
   }
 
   </script>
@@ -148,12 +263,16 @@
     <div class="container"> 
       <!-- Brand and toggle get grouped for better mobile display -->
       <div class="navbar-header">
-        <a class="navbar-brand page-scroll" href="/">Logo</a> 
+        <a class="navbar-brand page-scroll" href="/">TecTrees</a> 
       </div>
       <div class="navbar-brand" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav navbar-right">
           <li><a href="techtree" class="page-scroll">TechTree</a></li>
-          <li><a href="Login" class="page-scroll">Login</a></li>
+          <% if(email == null) { %>
+            <li class="login"><a href="Login" class="page-scroll">Login</a></li>
+          <% }else { %>
+            <li class="logout"><a href="Logout" class="page-scroll">Logout</a></li>
+          <% } %>
         </ul>
       </div>
     </div>
@@ -224,7 +343,7 @@
                     
                   <div class="pictures">
                     <img src="<%=i.logo_src%>">
-                  </div>
+                  </div> 
                     <div class="caption">
                       <h4 class= "caption-position"><%= i.position %><b class="match"></b></h4>
                       <p class="caption-company"><%=i.company %></p>
@@ -238,8 +357,43 @@
               </div>
           </div>
         <% } %>
+
         </div>
+        <nav aria-label="Page navigation" class="page-nav">
+          <ul class="pagination" id="pagination">
+
+          </ul>
+        </nav>
       </div>
+    </div>
+    <div class="footer-dark">
+      <footer>
+          <div class="container">
+              <div class="row">
+                  <div class="col-sm-6 col-md-3 item">
+                      <h3>Services</h3>
+                      <ul>
+                          <li><a href="#">Web design</a></li>
+                          <li><a href="#">Development</a></li>
+                          <li><a href="#">Hosting</a></li>
+                      </ul>
+                  </div>
+                  <div class="col-sm-6 col-md-3 item">
+                      <h3>About</h3>
+                      <ul>
+                          <li><a href="#">Company</a></li>
+                          <li><a href="#">Team</a></li>
+                          <li><a href="#">Careers</a></li>
+                      </ul>
+                  </div>
+                  <div class="col-md-6 item text">
+                      <h3>Company Name</h3>
+                      <p>Praesent sed lobortis mi. Suspendisse vel placerat ligula. Vivamus ac sem lacus. Ut vehicula rhoncus elementum. Etiam quis tristique lectus. Aliquam in arcu eget velit pulvinar dictum vel in justo.</p>
+                  </div>
+              </div>
+              <p class="copyright">Company Name © 2020</p>
+          </div>
+      </footer>
     </div>
   </div>
 </body>

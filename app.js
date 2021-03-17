@@ -5,6 +5,7 @@ const session = require('express-session');
 const logger = require('morgan');
 const path = require('path');
 const crypto = require('crypto');
+const Swal = require('sweetalert2');
 
 const pageRouter = require('./routes/page');
 

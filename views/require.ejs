@@ -91,12 +91,16 @@
     <div class="container"> 
       <!-- Brand and toggle get grouped for better mobile display -->
       <div class="navbar-header">
-        <a class="navbar-brand page-scroll" href="http://localhost:3000">Logo</a> 
+        <a class="navbar-brand page-scroll" href="http://localhost:3000">TecTrees</a> 
       </div>
       <div class="navbar-brand" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav navbar-right">
           <li><a href="http://localhost:3000/techtree" class="page-scroll">TechTree</a></li>
-          <li><a href="http://localhost:3000/login" class="page-scroll">Login</a></li>
+          <% if(email == null) { %>
+            <li class="http://localhost:3000/login"><a href="Login" class="page-scroll">Login</a></li>
+          <% }else { %>
+            <li class="http://localhost:3000/logout"><a href="Logout" class="page-scroll">Logout</a></li>
+          <% } %>
         </ul>
       </div>
     </div>
@@ -115,7 +119,7 @@
                 <h6><%=position_info.company%></h6>
               </div>
             </div>
-            <hr class="col-12">
+            <hr class="col-11">
 
             <div class="tech_stack col-12" id="techStack" data-stack="<%=position_info.tech_stack%>">
               <h5>기술 스택</h5>
@@ -138,11 +142,13 @@
             </div>
           </div>
           </div>
-    
-          <div class="col-4 mt-3">
-            <div class="row">
+          
+
+          <div class="col-4 right_section">
+            <div class="row justify-content-center">
               <% if(tech !== undefined) { %>
-                <div class="container p-5">
+                <p>Matching percentage</p>
+                <div class="container p-5 mb-5 text-center progress_box">
                   <div class="progress" id="progress" data-percentage="">
                     <span class="progress-left">
                       <span class="progress-bar"></span>
@@ -162,14 +168,15 @@
               <% }else { %>
                 <div></div>
               <% } %>
-              <!-- <div> -->
+              <div class="row justify-content-center">
                 <% if(position_info.location != null) { %>
+                  <p>Company Location</p>
                   <div id="map" data-loc="<%=position_info.location%>"></div>
-                  <em id="mapName" class="text-center"><%=position_info.location%></em>
+                  <p class="mapName text-center"><%=position_info.location%></p>
                 <% }else { %>
                   <div style="display: none;"></div>
                 <% } %>
-              <!-- </div> -->
+              </div>
             </div>
           </div>
 
