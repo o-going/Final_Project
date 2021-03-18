@@ -152,9 +152,6 @@
     console.log(pagination);
     for(let k=1; k<=pageBar; k++) {
       pagination.innerHTML += `<li class="page-item" id="page-item"><a class="page-link" href="#" onclick="move(${k})">${k}</a></li>`;
-      if(k == 20) {
-        break;
-      }
     }
 
   })
@@ -248,9 +245,6 @@
     pagination.innerHTML = "";
     for(let k=1; k<=pageBar; k++) {
       pagination.innerHTML += `<li class="page-item" id="page-item"><a class="page-link" href="#" onclick="move(${k})">${k}</a></li>`;
-      if(k == 20) {
-        break;
-      }
     }
   }
 
@@ -360,7 +354,7 @@
 
         </div>
         <nav aria-label="Page navigation" class="page-nav">
-          <ul class="pagination" id="pagination">
+          <ul class="pagination justify-content-center" id="pagination">
 
           </ul>
         </nav>

@@ -44,9 +44,6 @@
     console.log(pagination);
     for(let k=1; k<=pageBar; k++) {
       pagination.innerHTML += `<li class="page-item" id="page-item"><a class="page-link" href="#" onclick="move(${k})">${k}</a></li>`;
-      if(k==20) {
-        break;
-      }
     }
   });
 
