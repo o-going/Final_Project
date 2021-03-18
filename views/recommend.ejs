@@ -165,8 +165,6 @@
     let pagination = document.getElementById('pagination');
     let item = document.getElementById('page-item');
 
-    // item.classList.add('active');
-
     for(j=(pageNum-1)*posts; j<Math.min(pageNum*posts, child.length); j++) {
       console.log(child[j]);
       child[j].style.display = "none";
