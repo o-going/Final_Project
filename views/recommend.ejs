@@ -19,52 +19,51 @@
     function filter() {
       let search = document.getElementById('search').value.toUpperCase();
       let position = document.getElementsByClassName('position');
+      let count = 0;
 
       for(let i=0; i<position.length; i++) {
         let company = position[i].dataset.company;
-        
         if(company.toUpperCase().includes(search)) {
           console.log(company);
-          position[i].style.display = "flex"
+          count++;
+
+          pageBar = Math.ceil(count / posts);
+          console.log(pageBar);
+          for(let j=0; j<position.length; j++) {
+            position[j].style.display = "none";
+          }
+          // position[i].style.display = "flex";
         }else {
           position[i].style.display = "none"
         }
       }
-
-    //   let page = document.querySelector('#display');
-    // let child = page.children;
-    // let totalPost = child.length;  // 전체 posts 개수
-    // let pageBar = Math.ceil(totalPost / posts);
-    // console.log(pageBar);
-
-    // console.log(child);
-    // console.log(totalPost);
-
-    // for(let i=0; i<child.length; i++) {
-    //   child[i].style.display = "none";
-    // }
-
-    // for(j=(pageNum-1)*posts; j<pageNum*posts; j++) {
-    //   console.log(child[j]);
-    //   child[j].style.display = "flex";
-    // }
-
-    // // <li class="page-item"><a class="page-link" href="#">1</a></li>
-    // let pagination = document.getElementById('pagination');
-    // console.log(pagination);
-    // pagination.innerHTML = "";
-    // for(let k=1; k<=pageBar; k++) {
-    //   pagination.innerHTML += `<li class="page-item" id="page-item"><a class="page-link" href="#" onclick="move(${k})">${k}</a></li>`;
-    //   if(k == 1) {
-    //     break;
-    //   }
-    // }
-      
+      console.log(count);
     }
 
     let pageNum = 1;
     let posts = 6;
-    $('document').ready(function () {
+    let pageBar = 0;
+
+    function movePageBar() {
+      let pagination = document.getElementById('pagination'); 
+      console.log(pagination);
+      pageBarNum = 5;
+      pageBarStart = (pageBarNum * Math.floor((pageNum-1)/pageBarNum))+1
+      pagination.innerHTML = `<li class="page-item" id="page-item"><a class="page-link" href="#" onclick="move(${Math.max(1, pageNum-pageBarNum)})"> << </a></li>`;
+      pagination.innerHTML += `<li class="page-item" id="page-item"><a class="page-link" href="#" onclick="move(${Math.max(1, pageNum-1)})"> < </a></li>`;
+      for(let k=pageBarStart; k<=Math.min(pageBarStart+pageBarNum-1, pageBar); k++) {
+        if (k == pageNum) {
+          pagination.innerHTML += `<li class="page-item active" id="page-item"><a class="page-link" href="#" onclick="move(${k})">${k}</a></li>`;
+        }
+        else {
+          pagination.innerHTML += `<li class="page-item" id="page-item"><a class="page-link" href="#" onclick="move(${k})">${k}</a></li>`;
+        }
+      }
+      pagination.innerHTML += `<li class="page-item" id="page-item"><a class="page-link" href="#" onclick="move(${Math.min(pageBar, pageNum+1)})"> > </a></li>`;
+      pagination.innerHTML += `<li class="page-item" id="page-item"><a class="page-link" href="#" onclick="move(${Math.min(pageBar, pageNum+pageBarNum)})"> >> </a></li>`;
+    }
+
+  $('document').ready(function () {
       //let entire_positions = document.querySelectorAll('.position');
       
       $('.dropdown-item').on('click', function(e){
@@ -132,7 +131,7 @@
     let page = document.querySelector('#display');
     let child = page.children;
     let totalPost = child.length;  // 전체 posts 개수
-    let pageBar = Math.ceil(totalPost / posts);
+    pageBar = Math.ceil(totalPost / posts);
     console.log(pageBar);
 
     console.log(child);
@@ -147,14 +146,9 @@
       child[j].style.display = "flex";
     }
 
-    // <li class="page-item"><a class="page-link" href="#">1</a></li>
-    let pagination = document.getElementById('pagination');
-    console.log(pagination);
-    for(let k=1; k<=pageBar; k++) {
-      pagination.innerHTML += `<li class="page-item" id="page-item"><a class="page-link" href="#" onclick="move(${k})">${k}</a></li>`;
-    }
+    movePageBar();
 
-  })
+  });
 
   function move(newPageNum) {
     console.log('aa');
@@ -177,6 +171,7 @@
       child[j].style.display = "flex";
       item.classList.add('active');
     }
+    movePageBar();
   }
 
   let count = 0;
@@ -217,32 +212,6 @@
       for(let j=0; j<entire.length; j++) {
         display.appendChild(entire[j]);
       }
-    }
-
-    let page = document.querySelector('#display');
-    let child = page.children;
-    let totalPost = child.length;  // 전체 posts 개수
-    let pageBar = Math.ceil(totalPost / posts);
-    console.log(pageBar);
-
-    console.log(child);
-    console.log(totalPost);
-
-    for(let i=0; i<child.length; i++) {
-      child[i].style.display = "none";
-    }
-
-    for(j=(pageNum-1)*posts; j<pageNum*posts; j++) {
-      console.log(child[j]);
-      child[j].style.display = "flex";
-    }
-
-    // <li class="page-item"><a class="page-link" href="#">1</a></li>
-    let pagination = document.getElementById('pagination');
-    console.log(pagination);
-    pagination.innerHTML = "";
-    for(let k=1; k<=pageBar; k++) {
-      pagination.innerHTML += `<li class="page-item" id="page-item"><a class="page-link" href="#" onclick="move(${k})">${k}</a></li>`;
     }
   }
 
@@ -287,7 +256,7 @@
     <div class="reco-tag">
       <div class="container">
         <div class="row">
-          <div class="col-md-6 mx-auto">
+          <div class="col-md-6 search">
               <div id="custom-search-input">
                   <div class="input-group col-md-12">
                       <input type="text" id="search" class="form-control input-lg" placeholder="Search" />
@@ -303,7 +272,7 @@
           </div>
           
               <div class="dropdown" id="myDropdown">
-                <button class="btn btn-secondary dropdown-toggle mr-3" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button class="btn btn-secondary dropdown-toggle ml-5 mr-3" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   전체
                 </button>  
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">

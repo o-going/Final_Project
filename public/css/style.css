@@ -167,6 +167,10 @@ a {
 		/* vertical-align: middle; */
 }
 
+.picture-list a{
+	width: 100%;
+}
+
 .pictures {
 		display: flex;
 		align-items: center;
@@ -271,7 +275,7 @@ a {
 .node circle {
 	fill: #fff;
 	stroke: steelblue;
-	stroke-width: 2px;
+	stroke-width: 3px;
 }
 
 .found {
@@ -285,7 +289,7 @@ a {
 .link {
 	fill: none;
 	stroke: #ccc;
-	stroke-width: 1.5px;
+	stroke-width: 4px;
 }
 /*Just to ensure the select2 box is "glued" to the top*/
 .search {
@@ -295,6 +299,11 @@ a {
 .page-nav {
 	margin-top: 40px;
 }
+
+.tree_btn {
+	margin: 60px 20px;
+}
+
 
 /* require */
 
@@ -328,6 +337,10 @@ a {
 
 .right_section {
 	margin-top: 163px;
+}
+
+.search {
+	margin-left: 250px;
 }
 
 #custom-search-input{
@@ -381,7 +394,7 @@ Due to the split circle of progress-left and progress right, we must use the ani
 @for $i from 1 through $howManySteps {
 	$stepName: ($i*(100 / $howManySteps));
 
-	//animation only the left side if below 50%
+	/* //animation only the left side if below 50% */
 	@if $i <= ($howManySteps/2) { 
 		.progress[data-percentage="#{$stepName}"] {
 			.progress-right .progress-bar {
@@ -390,7 +403,7 @@ Due to the split circle of progress-left and progress right, we must use the ani
 			.progress-left .progress-bar {animation: 0;}
 		}
 	}
-	//animation only the right side if above 50%
+	/* //animation only the right side if above 50% */
 	@if $i > ($howManySteps/2)  {  
 		.progress[data-percentage="#{$stepName}"] {
 			.progress-right .progress-bar {
@@ -403,7 +416,7 @@ Due to the split circle of progress-left and progress right, we must use the ani
 	}
 }
 
-//animation
+/* //animation */
 @for $i from 1 through ($howManySteps/2) { 
 	$degrees: (180/($howManySteps/2));
 	$degrees: ($degrees*$i);
@@ -418,12 +431,6 @@ Due to the split circle of progress-left and progress right, we must use the ani
     }
 	}
 }
-
-
-
-
-
-
 
 /* login, signup form */
 body.login-page{
@@ -630,4 +637,114 @@ margin-top: 0.97rem;
 .gedf-card {
   margin-bottom: 2.77rem;
 }
+}
+
+/* profile */
+.main-body {
+	padding: 15px;
+	margin-top: 80px;
+	margin-bottom: 70px;
+}
+.card {
+	box-shadow: 0 1px 3px 0 rgba(0,0,0,.1), 0 1px 2px 0 rgba(0,0,0,.06);
+}
+
+.card {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	word-wrap: break-word;
+	background-color: #fff;
+	background-clip: border-box;
+	border: 0 solid rgba(0,0,0,.125);
+	border-radius: .25rem;
+}
+
+.card-body {
+	flex: 1 1 auto;
+	min-height: 1px;
+	padding: 1rem;
+}
+
+.gutters-sm {
+	margin-right: -8px;
+	margin-left: -8px;
+}
+
+.gutters-sm>.col, .gutters-sm>[class*=col-] {
+	padding-right: 8px;
+	padding-left: 8px;
+}
+.mb-3, .my-3 {
+	margin-bottom: 1rem!important;
+}
+
+.bg-gray-300 {
+	background-color: #e2e8f0;
+}
+.h-100 {
+	height: 100%!important;
+}
+.shadow-none {
+	box-shadow: none!important;
+}
+
+.link {
+	font-size: 14px;
+}
+
+.like {
+	height: 145px;
+	float: left;
+	/* width: 499px; */
+	/* height: 180px; */
+	/* margin-bottom: 24px; */
+	margin-right: 24px;
+	padding: 40px 20px;
+	/* box-shadow: 0 2px 8px 0 rgba(0,0,0,0.16); */
+	border-radius: 4px;
+}
+
+.like img{
+	/* width: 100px;
+	height: 100px;
+	border-radius: 10px;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	background-size: cover;
+	-o-background-size: cover; */
+	width: auto;
+	max-width: 4.5rem;
+	height: auto;
+	max-height: 5rem;
+	border-radius: 0.25rem;
+}
+
+.like .caption {
+	display: inline-block;
+	margin-left: 10px;
+	width: 80%;
+	text-overflow: ellipsis;
+	vertical-align: middle;
+}
+
+.like .caption h4 {
+	margin-top: 10px;
+	margin-right: 10px;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.like .caption p {
+	font-size: 12px;
+	font-weight: 500;
+	color: #444;
+}
+
+.like a {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
 }

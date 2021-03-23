@@ -17,6 +17,7 @@
    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
+   <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
    <link rel="stylesheet" href="/css/style.css">
    <link rel="stylesheet" href='/css/progressbar.css'>
@@ -68,6 +69,9 @@
     document.getElementById('progress').dataset.percentage = percentage;
     console.log(percentage)
 
+    // let position = document.getElementById('position').dataset.position;
+    // console.log(position);
+
     // let postFetch = () => {
     //       fetch("/recommend", {
     //         method: "POST",
@@ -85,6 +89,59 @@
     //     }
 
   })
+
+  function gotologin() {
+      location.replace('/login');
+    }
+
+  function timer() {
+      setTimeout('gotologin()', 1500);
+    }
+
+  function add() {
+    console.log('ok!');
+    let pass = "clicked!!";
+    let position = document.getElementById('position').dataset.position;
+    console.log(position);
+
+    $.ajax({
+      url: 'require',
+      method: 'POST',
+      headers: {
+        "Content-type": "application/json; charset=UTF-8"
+      },
+      data: JSON.stringify({
+        data: position
+      }),
+      success: function(response) {
+        if(response == false) {
+            // alert('로그인 후 이용하세요.');
+            Swal.fire({
+             position: 'center',
+             icon: 'error',
+             title: '로그인 후 이용하세요.',
+             showConfirmButton: false,
+             timer: 1500
+            })
+            timer()
+      }else {
+        console.log(response);
+            // alert('save!');
+            Swal.fire({
+             position: 'center',
+             icon: 'success',
+             title: '프로필에 추가되었습니다.',
+             showConfirmButton: false,
+             timer: 1500
+            })
+          }        
+      },
+      error: function(err) {
+        alert('no!');
+      }
+    })
+  }
+
 </script>
 <body>
   <nav id="menu" class="navbar navbar-default navbar-fixed-top">
@@ -112,11 +169,11 @@
         <div class="col-8">
           <div class="row">
             <div class="company_position">
-              <div class="position col-12">
+              <div class="position col-12" id="position" data-position="<%=info.positionId%>">
                 <h3><%=position_info.position%></h3>
               </div>
               <div class="company col-12" data-company="<%=position_info.company%>">
-                <h6><%=position_info.company%></h6>
+                <h6><%=position_info.company%><button class="btn-secondary ml-3" onclick="add()">추가</button></h6>
               </div>
             </div>
             <hr class="col-11">
@@ -124,7 +181,7 @@
             <div class="tech_stack col-12" id="techStack" data-stack="<%=position_info.tech_stack%>">
               <h5>기술 스택</h5>
               <% let tech_stack = JSON.parse(position_info.tech_stack) %>
-              <% for(let i=0; i<tech_stack.length; i++) {%>
+              <% for(let i=0; i<tech_stack.length; i++) { %>
                 <span class="badge badge-light"><%=tech_stack[i]%></span>
               <% } %> 
             </div>

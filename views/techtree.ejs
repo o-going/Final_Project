@@ -31,8 +31,8 @@
      }
 
      svg {
-       margin-top: 55px;
-       border: 1px solid #aaa;
+       /* margin-top: 1px; */
+       /* border: 1px solid #aaa; */
      }
 
      .node rect {
@@ -42,13 +42,14 @@
      }
 
      .node text{
-       font: 13px sans-serif;
+       font: 20px sans-serif;
+       font-weight: 700;
      }
 
      .link {
       fill: none;
       stroke: #ccc;
-      stroke-width: 1.5px;
+      stroke-width: 3px;
     }
    </style>
 
@@ -82,13 +83,13 @@
 
   <!-- <div id="search">
   </div> -->
-  <button class="btn btn-primary ml-5 mt-5" data-toggle="portfilter" data-target="all" onclick="recommend()">  <!--click 했을 때 event-->
+  <button class="btn btn-primary tree_btn btn-lg" data-toggle="portfilter" data-target="all" onclick="recommend()">  <!--click 했을 때 event-->
     다음
   </button>
-  <button class="btn btn-secondary ml-5 mt-5" data-toggle="portfilter" data-target="all" onclick="saveData()">  <!--click 했을 때 event-->
+  <button class="btn btn-success tree_btn btn-lg" data-toggle="portfilter" data-target="all" onclick="saveData()">  <!--click 했을 때 event-->
     저장
   </button>
-  <button class="btn btn-light ml-5 mt-5" data-toggle="portfilter" data-target="all" onclick="refresh()">
+  <button class="btn btn-danger tree_btn btn-lg" data-toggle="portfilter" data-target="all" onclick="refresh()">
     초기화
   </button>
   <div>
@@ -296,7 +297,7 @@
   
     var tree = d3.layout.tree()
       // .size([height, width])
-      .nodeSize([60, 100])
+      .nodeSize([60, 60])
       .separation(function() {
         return .6;
       })
@@ -702,5 +703,35 @@ window.addEventListener("load", () => {
 });
 
   </script> -->
+
+    <div class="footer-dark">
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-6 col-md-3 item">
+                    <h3>Services</h3>
+                    <ul>
+                        <li><a href="#">Web design</a></li>
+                        <li><a href="#">Development</a></li>
+                        <li><a href="#">Hosting</a></li>
+                    </ul>
+                </div>
+                <div class="col-sm-6 col-md-3 item">
+                    <h3>About</h3>
+                    <ul>
+                        <li><a href="#">Company</a></li>
+                        <li><a href="#">Team</a></li>
+                        <li><a href="#">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-6 item text">
+                    <h3>Company Name</h3>
+                    <p>Praesent sed lobortis mi. Suspendisse vel placerat ligula. Vivamus ac sem lacus. Ut vehicula rhoncus elementum. Etiam quis tristique lectus. Aliquam in arcu eget velit pulvinar dictum vel in justo.</p>
+                </div>
+            </div>
+            <p class="copyright">Company Name © 2020</p>
+        </div>
+    </footer>
+  </div>
 </body>
 </html>
