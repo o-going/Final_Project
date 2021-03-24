@@ -89,31 +89,35 @@ router.post('/signup', async(req, res) => {
 
 router.get('/profile', async(req, res) => {
   let email = req.session.email;
-  let sql = `SELECT * FROM users WHERE email='${email}'`;
-  let [user, col] = await con.query(sql);
-  let userId;
-  for(let i=0; i<user.length; i++) {
-    userId = parseInt(user[i].id);
+  try{
+    let sql = `SELECT * FROM users WHERE email='${email}'`;
+    let [user, col] = await con.query(sql);
+    let userId;
+    for(let i=0; i<user.length; i++) {
+      userId = parseInt(user[i].id);
+    }
+    console.log(userId);
+  
+    let usertech;
+    for(let i=0; i<user.length; i++) {
+      usertech = user[i].techtreedata.split(',');
+    }
+    console.log(usertech);
+  
+    let query = "SELECT pro.Id, user_Id, c.logo_src, pro.position_Id, p.position, c.company FROM profile AS pro "
+        query += "INNER JOIN users AS u ON u.id = pro.user_Id INNER JOIN positions AS p ON p.positionId = pro.position_Id "
+        query += `INNER JOIN companies AS c ON c.companyId = p.companyId WHERE user_Id = ${userId}`;
+    let [profile, _] = await con.query(query);
+  
+    res.render('profile', {
+      email: req.session.email,
+      name: req.session.name,
+      profile_position: profile,
+      usertech: usertech
+    });
+  }catch(err) {
+    console.log(err);
   }
-  console.log(userId);
-
-  let usertech;
-  for(let i=0; i<user.length; i++) {
-    usertech = user[i].techtreedata.split(',');
-  }
-  console.log(usertech);
-
-  let query = "SELECT pro.Id, user_Id, c.logo_src, pro.position_Id, p.position, c.company FROM profile AS pro "
-      query += "INNER JOIN users AS u ON u.id = pro.user_Id INNER JOIN positions AS p ON p.positionId = pro.position_Id "
-      query += `INNER JOIN companies AS c ON c.companyId = p.companyId WHERE user_Id = ${userId}`;
-  let [profile, _] = await con.query(query);
-
-  res.render('profile', {
-    email: req.session.email,
-    name: req.session.name,
-    profile_position: profile,
-    usertech: usertech
-  });
 });
 
 router.get('/techtree', async (req, res) => {
@@ -440,7 +444,7 @@ router.get('/recommend', async(req, res) => {  // 얻어온 data
 
   try {
     let query = "SELECT "
-    query += "positions.position,companies.logo_src,companies.company,positions.positionId,positions.tech_stack,positions.career "
+    query += "positions.position,companies.logo_src,companies.company,positions.positionId,positions.position_category,positions.tech_stack,positions.career "
     query += "from companies JOIN positions ON companies.companyId = positions.companyId WHERE "
     query += `positions.tech_stack LIKE '%"${tech[0]}"%' `
     for(i=1; i<tech.length; i++) {
@@ -450,6 +454,7 @@ router.get('/recommend', async(req, res) => {  // 얻어온 data
 
     res.render('recommend', {
       email: req.session.email,
+      name: req.session.name,
       companies: random,
       tech: tech
     });
@@ -470,12 +475,36 @@ router.get('/recommend', async(req, res) => {  // 얻어온 data
 
   res.render('recommend', {
     email: req.session.email,
+    name: req.session.name,
     companies: random,
     tech: undefined
   });
   }
   
 });
+
+router.post('/recommend', async (req, res) => {
+  try{
+    let data = req.body.data;
+    console.log(data+'dlekdkf');
+    if(data != undefined) {
+      // res.send(true);
+      let query = "SELECT "
+      query += "positions.position,companies.logo_src,companies.company,positions.positionId,positions.position_category,positions.tech_stack,positions.career "
+      query += "from companies JOIN positions ON companies.companyId = positions.companyId WHERE "
+      query += `positions.tech_stack LIKE '%"${data[0]}"%' `
+      for(i=1; i<data.length; i++) {
+        query += `OR positions.tech_stack LIKE '%"${data[i]}"%'` // tech[i]인 data만 가져옴 AND => 다 속하는 거 OR => 속한거 다
+      }
+      let [random, _]= await con.query(query);
+      
+      res.status(200).send({companies: random});
+    }
+    
+  }catch(err) {
+    console.log(err);
+  }
+})
 
 router.get('/require/:id', async (req, res) => {
   var id = req.params.id   // /require/1
@@ -489,10 +518,10 @@ router.get('/require/:id', async (req, res) => {
     // let sql = `SELECT id FROM users WHERE email='${email}'`;
     // let [user, col] = await con.query(sql);
     // console.log(user);
-
+    try {
     let query = "SELECT "
-    query += "positionId, companies.company, companies.location, positions.positionId, positions.position, positions.position_Info, positions.requirement, positions.preference, positions.tech_stack "
-    query += "FROM positions JOIN companies ON positions.companyId = companies.companyId WHERE positionId="+id
+        query += "positionId, companies.company, companies.location, positions.positionId, positions.position, positions.position_Info, positions.requirement, positions.preference, positions.tech_stack "
+        query += `FROM positions JOIN companies ON positions.companyId = companies.companyId WHERE positionId=`+id;
     // WHERE positionId="+id
 
     let positionInfo = await con.query(query)
@@ -514,18 +543,18 @@ router.get('/require/:id', async (req, res) => {
     let buff2 = new Buffer.from(pre, 'base64')
     let text2 = buff2.toString('utf-8')
     positionInfo[0][0].preference = text2
-  
-  // }catch(err) {
 
-  // }
-  res.render('require', {
-    email: req.session.email,
-    id : req.params.id ,
-    position_info: positionInfo[0][0],
-    info : info,
-    tech: data
-  });
-
+    res.render('require', {
+      email: req.session.email,
+      name: req.session.name,
+      id : req.params.id ,
+      position_info: positionInfo[0][0],
+      info : info,
+      tech: data
+    });
+    }catch(err) {
+      console.log(err);
+    }
 });
 
 router.post('/require/:id', async(req, res) => {
@@ -627,43 +656,6 @@ router.get('/', async (req, res) => {
         console.log(err);
       }
     }
-  // }catch(err) {
-  //   console.log(err)
-  // }
-  // if(req.session.email != null) {
-  //   try {
-
-  //   }
-  // }
 });
-
-// router.get('/', async(req, res) => {
-//   let pageNum = Number(req.query.pageNum) || 1; // 쿼리 스트링으로 받을 값, 기본값 1
-//   let contentSize = 10; // 페이지에서 보여줄 컨텐츠 개수
-//   let pnSize = 10; // 페이지네이션 개수 설정 -> 밑에 bar
-//   let skipSize = (pageNum - 1) * contentSize; // 다음 페이지 이동시 건너뛸 리스트 개수
-
-//   con.query("SELECT COUNT(*) as a from companies JOIN positions ON companies.companyId = positions.companyId", (countQueryErr, countQueryResult) => {
-//     if(countQueryErr) throw countQueryErr;
-//     let totalCount = Number(countQueryResult[0].count); // 전체 글 개수
-//     let pnTotal = Math.ceil(totalCount / contentSize) // 페이지네이션의 전체 카운트
-//     let pnStart = ((Math.ceil(pageNum / pnSize) - 1) * pnSize) + 1  // 현재 페이지의 페이지네이션 시작 번호
-//     let pnEnd = (pnStart + pnSize) - 1;  // 현재 페이지의 페이지네이션 끝 번호
-//     con.query("SELECT positions.position,companies.logo_src,companies.company,positions.positionId,positions.tech_stack from companies JOIN positions ON companies.companyId = positions.companyId ORDER BY id DESC LIMIT ?, ?", [skipSize, contentSize], (contentQueryErr, contentQueryResult) => {
-//       if(contentQueryErr) throw contentQueryErr;
-//       if(pnEnd > pnTotal) pnEnd = pnTotal // 페이지네이션의 끝 번호가 페이지네이션 전체 카운트보다 높을 경우
-//       let result = {
-//         pageNum,
-//         pnStart,
-//         pnEnd,
-//         pnTotal,
-//         contents: contentQueryResult,
-//       };
-//       res.render('main', {
-//         articles: result,
-//       });
-//     });
-//     });
-//   }); 
 
 module.exports = router;

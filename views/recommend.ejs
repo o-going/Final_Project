@@ -22,23 +22,21 @@
       let count = 0;
 
       for(let i=0; i<position.length; i++) {
+        position[i].style.display = "none"
         let company = position[i].dataset.company;
         if(company.toUpperCase().includes(search)) {
-          console.log(company);
+          // console.log(position[i]);
           count++;
 
           pageBar = Math.ceil(count / posts);
           console.log(pageBar);
-          for(let j=0; j<position.length; j++) {
-            position[j].style.display = "none";
-          }
+
           position[i].style.display = "flex";
-        }else {
-          position[i].style.display = "none"
+          }else {
+            position[i].style.display = "none"
+          }
         }
       }
-      console.log(count);
-    }
 
     let pageNum = 1;
     let posts = 6;
@@ -65,7 +63,15 @@
 
   $('document').ready(function () {
       //let entire_positions = document.querySelectorAll('.position');
-      
+      let positions = document.querySelectorAll('.position');
+      // let category = document.getElementById('position').dataset.category.split(',');
+
+      for(let a=0; a<positions.length; a++) {
+        let category = positions[a].dataset.category.split(',');
+        console.log(category);
+      }
+ 
+
       $('.dropdown-item').on('click', function(e){
         // console.log(e)
         let value = e.target.innerHTML;
@@ -233,6 +239,7 @@
           <% if(email == null) { %>
             <li class="login"><a href="Login" class="page-scroll">Login</a></li>
           <% }else { %>
+            <li id="username" data-email="<%=email%>"><a href="profile" class="page-scroll"><%=name%>님</a></li>
             <li class="logout"><a href="Logout" class="page-scroll">Logout</a></li>
           <% } %>
         </ul>
@@ -295,7 +302,7 @@
       <div class="container">
         <div id="display" class="row">
           <% for(i of companies) { %>
-            <div class="col-md-6 clearfix position" data-position="<%= i.position %>" data-company="<%=i.company%>" data-career="<%=i.career%>" data-stack="<%=i.tech_stack%>" data-percentage="">
+            <div id="position" class="col-md-6 clearfix position" data-category="<%=i.position_category%>" data-position="<%= i.position %>" data-company="<%=i.company%>" data-career="<%=i.career%>" data-stack="<%=i.tech_stack%>" data-percentage="">
               <div class="picture-list">
                 <% if(tech !== undefined) { %>
                   <a href="/require/<%=i.positionId%>?data=<%=tech%>">

@@ -230,6 +230,7 @@ a {
 	color: rgb(37, 54, 141);
 }
 
+
 /* recommend */
 
 .position-list {
@@ -304,6 +305,62 @@ a {
 	margin: 60px 20px;
 }
 
+#tree-right {
+	position: absolute;
+	top: 30%;
+	left: 68%;
+}
+
+/* #right-text {
+	font-size: 28px;
+	margin-bottom: 30px;
+} */
+
+.category-list {
+	font-size: 26px;
+	margin-bottom: 10px;
+	/* list-style: none; */
+}
+
+#category-list span {
+	font-size: 20px;
+	font-weight: 600;
+	color: #555;
+}
+
+/* #choice h2 {
+	font-size: 28px;
+	margin-bottom: 30px;
+} */
+
+.right-info {
+	font-family: Noto Sans;
+	font-style: normal;
+	font-weight: normal;
+	font-size: 24px;
+	line-height: 32px;
+/* identical to box height, or 133% */
+	text-align: center;
+	letter-spacing: -0.01em;
+	color: #2B292D;
+	margin-bottom: 34px;
+}
+
+li.right-info {
+	margin-bottom: 25px;
+}
+
+.right-title {
+	font-family: Noto Sans;
+	font-style: normal;
+	font-weight: bold;
+	font-size: 36px;
+	line-height: 72px;
+	/* identical to box height, or 200% */
+	text-align: center;	
+	letter-spacing: 0.045em;
+	color: #2B292D;
+}
 
 /* require */
 

@@ -154,9 +154,10 @@
         <ul class="nav navbar-nav navbar-right">
           <li><a href="http://localhost:3000/techtree" class="page-scroll">TechTree</a></li>
           <% if(email == null) { %>
-            <li class="http://localhost:3000/login"><a href="Login" class="page-scroll">Login</a></li>
+            <li><a href="http://localhost:3000/Login" class="page-scroll">Login</a></li>
           <% }else { %>
-            <li class="http://localhost:3000/logout"><a href="Logout" class="page-scroll">Logout</a></li>
+            <li id="username" data-email="<%=email%>"><a href="http://localhost:3000/profile" class="page-scroll"><%=name%>님</a></li>
+            <li><a href="http://localhost:3000/Logout" class="page-scroll">Logout</a></li>
           <% } %>
         </ul>
       </div>

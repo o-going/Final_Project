@@ -11,7 +11,8 @@
    <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-   
+   <script src="https://d3js.org/d3.v5.js"></script>
+
    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css"></link>
 
    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
@@ -22,7 +23,7 @@
 
    <link rel="stylesheet" href="css/style.css">
    <link rel="stylesheet" href="css/techtree.css">
-   <link rel="preconnect" href="https://fonts.gstatic.com">
+   <!-- <link rel="preconnect" href="https://fonts.gstatic.com"> -->
    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">   
   
    <style>
@@ -31,8 +32,9 @@
      }
 
      svg {
-       /* margin-top: 1px; */
+       margin-right: 1000px;
        /* border: 1px solid #aaa; */
+       border-right: 1px solid #aaa;
      }
 
      .node rect {
@@ -69,7 +71,7 @@
           <% if(email == null) { %>
             <li class="login"><a href="Login" class="page-scroll">Login</a></li>
           <% }else { %>
-            <li id="username" data-email="<%=email%>"><a><%=name%>님</a></li>
+            <li id="username" data-email="<%=email%>"><a href="profile" class="page-scroll"><%=name%>님</a></li>
             <li class="logout"><a href="Logout" class="page-scroll">Logout</a></li>
           <% } %>
         </ul>
@@ -92,13 +94,38 @@
   <button class="btn btn-danger tree_btn btn-lg" data-toggle="portfilter" data-target="all" onclick="refresh()">
     초기화
   </button>
+  <button class="btn btn-outline-dark tree_btn btn-lg" data-toggle="portfilter" data-target="all" onclick="category()">
+    관련 직무 바로보기
+  </button>
   <div>
     <% for(let i=0; i<user.length; i++) { %>
       <div id='techtreedata' data-techtree="<%=user[i].techtreedata%>" style="display: none;"></div>
     <% } %>
   </div>
 
+  <div id="tree-right">
+    <div id="choice"></div>
+    <div id="right-text"></div>
+    <ol id="category-list">
+    </ol>
+    <div id="company-reco" data-id="", data-tech="", data-logo="", data-position="", data-company="">
+        <div class="col-sm-6 mb-3">
+          <div class="card h-100">
+            <div class="card-body like">
+              <div class="pictures">
+              </div>
+              <div class="caption">
+                <h4></h4>
+                <p></p>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>
+  
   <script type="text/javascript">
+
   window.addEventListener("load", function() {
     let data = document.getElementById('techtreedata').dataset.techtree;
     let email = document.getElementById('username').dataset.email;
@@ -143,6 +170,100 @@
       // let data = JSON.parse(sessionStorage.getItem('item'));
 
       window.location = "/recommend?data="+encodeURIComponent(JSON.stringify(save2)) // window.location으로 주소로 data를 문자열로 보내줌
+    }
+    
+    function category() {
+      let right = document.getElementById('tree-right');
+      let choice = document.getElementById('choice');
+      let cate = document.getElementById('category-list');
+      let pageRight = document.getElementById('right-text');
+      let company = document.getElementById('company-reco');
+      choice.innerHTML = "";
+      cate.innerHTML = "";
+      pageRight.innerHTML = "";
+      company = "";
+
+      let save = [];
+      let save2 = [];
+      search_select_node(root, save)
+      for(i of save) {
+        save2.push(i.name); //save 객체의 name만 뽑아서 push
+      }
+      console.log(save2);
+      console.log(save);
+
+      choice.innerHTML += `<h2 class="right-title">선택 기술</h2>`;
+      choice.innerHTML += `<p class="right-info">${save2}</p>`;
+
+      $.ajax({
+        url: '/recommend',
+        method: 'POST',
+        headers: {
+          "Content-type": "application/json; charset=UTF-8"
+        },
+        data: JSON.stringify({
+          data: save2
+        }),
+        success: function(response) {
+          // console.log(response);
+          // alert('success!');
+
+          let pageRight = document.getElementById('right-text');
+          pageRight.innerHTML += `<h2 class="right-title">관련 직무</h2>`;
+          let companies = response;
+          let position_list = [];
+          for(let j of Object.keys(companies)) {
+            let company = companies[j];
+            // console.log(company);
+            for(let k=0; k<company.length; k++) {
+              let position_category = company[k].position_category.split(',');
+              // console.log(company[k].positionId);
+              
+              for(let l=0; l<position_category.length; l++) {
+                position_list.push(position_category[l].trim());
+              }
+            }
+          }
+          // console.log(position_list);
+          let result = {};
+          let totalCount = 0;
+          position_list.forEach((x) => {
+            if(result[x]) {
+              result[x] = result[x] + 1;
+              totalCount++;
+            }else {
+              result[x] = 0 + 1;
+              totalCount++;
+            }
+          });
+          // console.log(totalCount);
+          let sortobj = [];
+          for(let number in result) {
+            sortobj.push([number, result[number]]);
+          }
+          sortobj.sort(function(a,b) {
+            return b[1] - a[1];
+          });
+
+          // console.log(sortobj);
+
+          for(let a=0; a<sortobj.length; a++) {
+            let eachCount = sortobj[a][1];
+            let percentage = (eachCount * 100 / totalCount).toFixed(1);
+            // console.log(percentage);
+
+            let cate = document.getElementById('category-list');
+            cate.innerHTML += `<li class="right-info">${sortobj[a][0]}<span> ${percentage}%</span></li>`;
+            if(a == 2) {
+              break; 
+            }
+          }
+          
+        },
+        error: function(err) {
+          console.log(err);
+        }        
+      });    
     }
 
     function refresh() {
@@ -278,14 +399,13 @@
       })
       .translate([150,200]);
 
-
     var div = d3.select("body")
       .append("div") // declare the tooltip div
       .attr("class", "tooltip")
       .style("opacity", 0);
   
     var margin = {top: 700, right: 200, bottom: 0, left: 250},
-      width = 1500 - margin.right - margin.left,
+      width = 1000 - margin.right - margin.left,
       height = 1400 - margin.top - margin.bottom;
   
     var i = 0,
