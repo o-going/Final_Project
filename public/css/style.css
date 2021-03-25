@@ -19,6 +19,11 @@ a {
 	margin: 0 auto;
 }
 
+.filter {
+	filter:sepia(100%);
+	-webkit-filter:sepia(100%);
+}
+
 /* Navigation */
 #menu {
 	/* position: fixed; */
@@ -292,6 +297,7 @@ a {
 	stroke: #ccc;
 	stroke-width: 4px;
 }
+
 /*Just to ensure the select2 box is "glued" to the top*/
 .search {
 	width: 50%;
@@ -308,7 +314,7 @@ a {
 #tree-right {
 	position: absolute;
 	top: 30%;
-	left: 68%;
+	left: 62%;
 }
 
 /* #right-text {

@@ -93,7 +93,7 @@ router.get('/profile', async(req, res) => {
     let sql = `SELECT * FROM users WHERE email='${email}'`;
     let [user, col] = await con.query(sql);
     let userId;
-    for(let i=0; i<user.length; i++) {
+    for(let i=0; i<user.length; i++) {ㄴ
       userId = parseInt(user[i].id);
     }
     console.log(userId);
@@ -486,7 +486,7 @@ router.get('/recommend', async(req, res) => {  // 얻어온 data
 router.post('/recommend', async (req, res) => {
   try{
     let data = req.body.data;
-    console.log(data+'dlekdkf');
+    console.log(data);
     if(data != undefined) {
       // res.send(true);
       let query = "SELECT "

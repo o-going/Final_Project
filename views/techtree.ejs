@@ -102,35 +102,39 @@
       <div id='techtreedata' data-techtree="<%=user[i].techtreedata%>" style="display: none;"></div>
     <% } %>
   </div>
-
-  <div id="tree-right">
+  <div id="tree-left" class="col-7"></div>
+  <div id="tree-right" class="col-5">
     <div id="choice"></div>
     <div id="right-text"></div>
     <ol id="category-list">
     </ol>
     <div id="company-reco" data-id="", data-tech="", data-logo="", data-position="", data-company="">
         <div class="col-sm-6 mb-3">
-          <div class="card h-100">
-            <div class="card-body like">
-              <div class="pictures">
+          <div class="right-company">
+            <div class="card-right">
+              <div class="pictures01">
+                <img src="">
+                <div class="caption01">
+                  <h4></h4>
+                  <p></p>
+                </div>
               </div>
-              <div class="caption">
-                <h4></h4>
-                <p></p>
-              </div>
+
             </div>
           </div>
         </div>
 
         <div class="col-sm-6 mb-3">
-          <div class="card h-100">
-            <div class="card-body like">
-              <div class="pictures">
+          <div class="right-company">
+            <div class="card-right">
+              <div class="pictures02">
+                <img src="">
+                <div class="caption02">
+                  <h4></h4>
+                  <p></p>
+                </div>
               </div>
-              <div class="caption">
-                <h4></h4>
-                <p></p>
-              </div>
+
             </div>
           </div>
         </div>
@@ -142,6 +146,7 @@
   window.addEventListener("load", function() {
     let data = document.getElementById('techtreedata').dataset.techtree;
     let email = document.getElementById('username').dataset.email;
+
     console.log(email);
     console.log(data);
     console.log(typeof(data));
@@ -187,16 +192,16 @@
     
     function category() {
       let resData;
-
+      
       let right = document.getElementById('tree-right');
       let choice = document.getElementById('choice');
       let cate = document.getElementById('category-list');
       let pageRight = document.getElementById('right-text');
-      let company = document.getElementById('company-reco');
+      let company = document.getElementsByClassName('card-right');
+      console.log(company);
       choice.innerHTML = "";
       cate.innerHTML = "";
       pageRight.innerHTML = "";
-      company = "";
 
       let save = [];
       let save2 = [];
@@ -269,24 +274,17 @@
             // console.log(percentage);
 
             let cate = document.getElementById('category-list');
-            cate.innerHTML += `<li class="right-info">${sortobj[a][0]}<span> ${percentage}%</span></li>`;
+            cate.innerHTML += `<p class="right-info">${sortobj[a][0]}<span> ${percentage}%</span></p>`;
             if(a == 2) {
               break; 
             }
           }
-          
         },
         error: function(err) {
           console.log(err);
         }        
       });    
       // console.log(resData);
-      for(let i of Object.keys(resData)) {
-        console.log(resData[i][0]);
-        console.log(resData[i][1]);
-        let company = document.getElementById('company-reco');
-        company.dataset.id = resData[i][0].positionId;
-      }
     }
 
     function refresh() {
@@ -377,7 +375,7 @@
       
     }
 
-    function search_select_node(obj, path) { 
+    function search_select_node(obj, path) {
       let root = "Programming Language";
       if(obj.children || obj._children){ //if children are collapsed d3 object will have them instantiated as _children
         var children = (obj.children) ? obj.children : obj._children; // children이 펴져있는 애들이면 children, 접혀있는 애들이면 _children
@@ -451,7 +449,7 @@
     let boxWidth = 150,
         boxHeight = 40;
 
-    var svg = d3.select("body").append("svg")
+    var svg = d3.select("#tree-left").append("svg")
       .attr("width", width + margin.right + margin.left)
       .attr("height", height + margin.top + margin.bottom)
       // .attr('width', 1500)
