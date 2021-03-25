@@ -121,6 +121,19 @@
             </div>
           </div>
         </div>
+
+        <div class="col-sm-6 mb-3">
+          <div class="card h-100">
+            <div class="card-body like">
+              <div class="pictures">
+              </div>
+              <div class="caption">
+                <h4></h4>
+                <p></p>
+              </div>
+            </div>
+          </div>
+        </div>
     </div>
   </div>
   
@@ -173,6 +186,8 @@
     }
     
     function category() {
+      let resData;
+
       let right = document.getElementById('tree-right');
       let choice = document.getElementById('choice');
       let cate = document.getElementById('category-list');
@@ -204,16 +219,17 @@
         data: JSON.stringify({
           data: save2
         }),
+        async: false,
         success: function(response) {
           // console.log(response);
           // alert('success!');
-
+          resData = response;
           let pageRight = document.getElementById('right-text');
           pageRight.innerHTML += `<h2 class="right-title">관련 직무</h2>`;
-          let companies = response;
+          // let companies = response;
           let position_list = [];
-          for(let j of Object.keys(companies)) {
-            let company = companies[j];
+          for(let j of Object.keys(resData)) {
+            let company = resData[j];
             // console.log(company);
             for(let k=0; k<company.length; k++) {
               let position_category = company[k].position_category.split(',');
@@ -264,6 +280,13 @@
           console.log(err);
         }        
       });    
+      // console.log(resData);
+      for(let i of Object.keys(resData)) {
+        console.log(resData[i][0]);
+        console.log(resData[i][1]);
+        let company = document.getElementById('company-reco');
+        company.dataset.id = resData[i][0].positionId;
+      }
     }
 
     function refresh() {
