@@ -68,11 +68,11 @@
     <div class="container"> 
       <!-- Brand and toggle get grouped for better mobile display -->
       <div class="navbar-header">
-        <a class="navbar-brand page-scroll" href="/">TechTrees</a> 
+        <a class="navbar-brand page-scroll" href="/">TechTree</a> 
       </div>
       <div class="navbar-brand" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav navbar-right">
-          <li><a href="techtree" class="page-scroll">TechTree</a></li>
+          <li><a href="techtree" class="page-scroll">Tech Tree</a></li>
           <% if(email == null) { %>
             <li class="login"><a href="Login" class="page-scroll">Login</a></li>
           <% }else { %>
@@ -151,7 +151,7 @@
           console.log(paths);
         }
         else{
-          alert(t +" not found!");
+          // alert(t +" not found!");
         }
       }
     }
@@ -203,6 +203,7 @@
       console.log(save);
 
       // sessionStorage.setItem('data', JSON.stringify(save2));
+
       choice.innerHTML += `<p class="right-title choice-title"><span>💻</span> 선택 기술 <strong class="right-info badge badge-light">${save2}</strong> 에 따른 포지션 추천</p>`;
       // choice.innerHTML += ``;
       $.ajax({

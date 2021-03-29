@@ -159,11 +159,11 @@
     <div class="container"> 
       <!-- Brand and toggle get grouped for better mobile display -->
       <div class="navbar-header">
-        <a class="navbar-brand page-scroll" href="http://localhost:3000">TecTrees</a> 
+        <a class="navbar-brand page-scroll" href="http://localhost:3000">TechTree</a> 
       </div>
       <div class="navbar-brand" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav navbar-right">
-          <li><a href="http://localhost:3000/techtree" class="page-scroll">TechTree</a></li>
+          <li><a href="http://localhost:3000/techtree" class="page-scroll">Tech Tree</a></li>
           <% if(email == null) { %>
             <li><a href="http://localhost:3000/Login" class="page-scroll">Login</a></li>
           <% }else { %>
@@ -192,7 +192,7 @@
                 <% if(email == null) { %>
                   <h3><%=position_info.position%></h3>
                 <% }else { %>
-                  <h3><%=position_info.position%><button class="btn-primary ml-5 btn-sm" onclick="add()">추가</button></h3>
+                  <h3><%=position_info.position%><button class="btn btn-outline-primary ml-3 btn-sm" onclick="add()">추가</button></h3>
                  <% } %> 
               </div>
               <div class="company col-12" data-company="<%=position_info.company%>">
