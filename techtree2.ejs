@@ -19,20 +19,22 @@
    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.js"></script>
    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
    <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-   <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+
 
    <link rel="stylesheet" href="css/style.css">
    <link rel="stylesheet" href="css/techtree.css">
    <!-- <link rel="preconnect" href="https://fonts.gstatic.com"> -->
-   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">   
-  
+   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+
    <style>
      body {
        text-align: center;
      }
 
      svg {
-       /* background-color: rgb(248, 253, 255); */
+       /* margin-right: 1000px;*/
+        /*border: 1px solid #aaa;*/
+
      }
 
      .node rect {
@@ -65,10 +67,10 @@
 <body>
   <!-- Navigation-->
   <nav id="menu" class="navbar navbar-default navbar-fixed-top">
-    <div class="container"> 
+    <div class="container">
       <!-- Brand and toggle get grouped for better mobile display -->
       <div class="navbar-header">
-        <a class="navbar-brand page-scroll" href="/">TechTrees</a> 
+        <a class="navbar-brand page-scroll" href="/">TechTrees</a>
       </div>
       <div class="navbar-brand" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav navbar-right">
@@ -90,24 +92,21 @@
 
   <!-- <div id="search">
   </div> -->
-  <div class="tree_btn_group">
-    <button class="btn btn-warning btn-lg" id="tech_count"></button>
-    <button class="btn btn-outline-info tree_btn btn-sm" data-toggle="portfilter" data-target="all" onclick="expandCollapseAll()">  <!--click 했을 때 event-->
-      전체펼치기/접기
-    </button>
-    <!-- <button class="btn btn-primary tree_btn btn-lg" data-toggle="portfilter" data-target="all" onclick="recommend()">
-      다음
-    </button> -->
-    <button class="btn btn-outline-success tree_btn btn-sm" data-toggle="portfilter" data-target="all" onclick="saveData()">  <!--click 했을 때 event-->
-      저장
-    </button>
-    <button class="btn btn-outline-danger tree_btn btn-sm" data-toggle="portfilter" data-target="all" onclick="refresh()">
-      초기화
-    </button>
-    <button class="btn btn-outline-dark tree_btn btn-sm" data-toggle="portfilter" data-target="all" onclick="category()">
-      다음
-    </button>
-  </div>
+  <button class="btn btn-info tree_btn btn-lg" data-toggle="portfilter" data-target="all" onclick="expandCollapseAll()">  <!--click 했을 때 event-->
+    전체펼치기/접기
+  </button>
+  <button class="btn btn-primary tree_btn btn-lg" data-toggle="portfilter" data-target="all" onclick="recommend()">  <!--click 했을 때 event-->
+    다음
+  </button>
+  <button class="btn btn-success tree_btn btn-lg" data-toggle="portfilter" data-target="all" onclick="saveData()">  <!--click 했을 때 event-->
+    저장
+  </button>
+  <button class="btn btn-danger tree_btn btn-lg" data-toggle="portfilter" data-target="all" onclick="refresh()">
+    초기화
+  </button>
+  <button class="btn btn-outline-dark tree_btn btn-lg" data-toggle="portfilter" data-target="all" onclick="category()">
+    관련 직무 바로보기
+  </button>
   <div>
     <% for(let i=0; i<user.length; i++) { %>
       <div id='techtreedata' data-techtree="<%=user[i].techtreedata%>" style="display: none;"></div>
@@ -115,26 +114,53 @@
   </div>
   <div id="tree-left" class="col-7"></div>
   <div id="tree-right" class="col-5">
-    <div id="choicePosition"></div>
-    <div id="right-company"></div>
-    <div id="relatedPosition">
+    <div id="choice"></div>
+    <div id="right-text"></div>
+    <ol id="category-list">
+    </ol>
+    <div id="company-reco" data-id="", data-tech="", data-logo="", data-position="", data-company="">
+        <div class="col-sm-6 mb-3">
+          <div class="right-company">
+            <div class="card-right">
+              <div class="pictures01">
+                <img src="">
+                <div class="caption01">
+                  <h4></h4>
+                  <p></p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="col-sm-6 mb-3">
+          <div class="right-company">
+            <div class="card-right">
+              <div class="pictures02">
+                <img src="">
+                <div class="caption02">
+                  <h4></h4>
+                  <p></p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
     </div>
-    <canvas id="myChart" width="100px" height="50%"></canvas>
   </div>
-  
+
   <script type="text/javascript">
 
   window.addEventListener("load", function() {
-    let techCount = document.getElementById('tech_count');
-    techCount.style.display = "none";
-
     let data = document.getElementById('techtreedata').dataset.techtree;
     let email = document.getElementById('username').dataset.email;
 
     console.log(email);
     console.log(data);
     console.log(typeof(data));
-    
+
     if(email != null) {
       let data2 = data.split(',');
       console.log(data2);
@@ -163,7 +189,7 @@
       search_select_node(root, save)
       for(i of save) {
         save2.push(i.name); //save 객체의 name만 뽑아서 push
-        
+
       }
       console.log(save2);
       console.log(save);
@@ -173,25 +199,19 @@
 
       window.location = "/recommend?data="+encodeURIComponent(JSON.stringify(save2)) // window.location으로 주소로 data를 문자열로 보내줌
     }
-    
-    function category() {      
-      let resData;
-      let right = document.getElementById('tree-right');
-      let choice = document.getElementById('choicePosition');
-      let cate = document.getElementById('relatedPosition');
-      let rightCompany = document.getElementById('right-company');
-      // let hide = document.getElementsByClassName('right-company');
-      // console.log(hide);
-      // for(let i=0; i<hide.length; i++) {
-      //   hide[i].style.display = "flex";
-      // }
 
-      // let company = document.getElementsByClassName('card-right');
-      // console.log(company);
-      rightCompany.innerHTML = "";
+    function category() {
+      let resData;
+
+      let right = document.getElementById('tree-right');
+      let choice = document.getElementById('choice');
+      let cate = document.getElementById('category-list');
+      let pageRight = document.getElementById('right-text');
+      let company = document.getElementsByClassName('card-right');
+      console.log(company);
       choice.innerHTML = "";
       cate.innerHTML = "";
-      // pageRight.innerHTML = "";
+      pageRight.innerHTML = "";
 
       let save = [];
       let save2 = [];
@@ -202,9 +222,9 @@
       console.log(save2);
       console.log(save);
 
-      // sessionStorage.setItem('data', JSON.stringify(save2));
-      choice.innerHTML += `<p class="right-title choice-title"><span>💻</span> 선택 기술 <strong class="right-info badge badge-light">${save2}</strong> 에 따른 포지션 추천</p>`;
-      // choice.innerHTML += ``;
+      choice.innerHTML += `<h2 class="right-title">선택 기술</h2>`;
+      choice.innerHTML += `<p class="right-info">${save2}</p>`;
+
       $.ajax({
         url: '/recommend',
         method: 'POST',
@@ -216,11 +236,11 @@
         }),
         async: false,
         success: function(response) {
-          console.log(response);
+          // console.log(response);
           // alert('success!');
           resData = response;
-          // let pageRight = document.getElementById('right-text');
-          choice.innerHTML += `<p class="more"><a class="btn btn-outline-primary" href="#" onclick="recommend()">더 많은 구인공고 보기 >></a></p>`;
+          let pageRight = document.getElementById('right-text');
+          pageRight.innerHTML += `<h2 class="right-title">관련 직무</h2>`;
           // let companies = response;
           let position_list = [];
           for(let j of Object.keys(resData)) {
@@ -229,28 +249,9 @@
             for(let k=0; k<company.length; k++) {
               let position_category = company[k].position_category.split(',');
               // console.log(company[k].positionId);
-              
+
               for(let l=0; l<position_category.length; l++) {
                 position_list.push(position_category[l].trim());
-              }
-            }
-          }
-          for(let q of Object.keys(resData)) {
-            let company = resData[q];
-            for(let w=0; w<company.length; w++) {
-              rightCompany.innerHTML += `<div class="right-company">
-                                              <div class="entire-info">
-                                                <div class="right-pictures">
-                                                <img src="${company[w].logo_src}" />
-                                                </div>
-                                                <div class="caption">
-                                                  <h4>${company[w].position}</h4>  
-                                                  <p>${company[w].company}</p>  
-                                                </div>
-                                              </div>
-                                            </div>`
-              if(w == 1) {
-                break;
               }
             }
           }
@@ -276,66 +277,23 @@
           });
 
           // console.log(sortobj);
-          let chart_data =[];
-          let chart_categories = [];
-          cate.innerHTML += `<p class="right-title"><span>💼</span> 관련 직무 TOP 5</p>`;
+
           for(let a=0; a<sortobj.length; a++) {
             let eachCount = sortobj[a][1];
             let percentage = (eachCount * 100 / totalCount).toFixed(1);
             // console.log(percentage);
 
-            let cate = document.getElementById('relatedPosition');
-            // cate.innerHTML += `<p class="right-info">${sortobj[a][0]}<span> ${percentage}%</span></p>`;
-            chart_data.push(sortobj[a][0]);
-            chart_categories.push(percentage);
-            if(a == 4) {
-              break; 
+            let cate = document.getElementById('category-list');
+            cate.innerHTML += `<p class="right-info">${sortobj[a][0]}<span> ${percentage}%</span></p>`;
+            if(a == 2) {
+              break;
             }
           }
-          console.log(chart_data);
-          console.log(chart_categories);
-          var ctx = document.getElementById('myChart').getContext('2d');
-          var myChart = new Chart(ctx, {
-              type: 'horizontalBar',  //horizontalBar
-              data: {
-                  labels: chart_data,
-                  datasets: [{
-                      label: 'Related Positions (%)',
-                      data: chart_categories,
-                      backgroundColor: [
-                          'rgba(255, 159, 64, 1)',
-                          'rgba(54, 162, 235, 1)',
-                          'rgba(255, 206, 86, 1)',
-                          'rgba(75, 192, 192, 1)',
-                          'rgba(153, 102, 255, 1)',
-                          'rgba(255, 159, 64, 1)'
-                      ],
-                      borderColor: [
-                          'rgba(255, 159, 64, 1)',
-                          'rgba(54, 162, 235, 1)',
-                          'rgba(255, 206, 86, 1)',
-                          'rgba(75, 192, 192, 1)',
-                          'rgba(153, 102, 255, 1)',
-                          'rgba(255, 159, 64, 1)'
-                      ],
-                      borderWidth: 1
-                  }]
-              },
-              options: {
-                  scales: {
-                      yAxes: [{
-                          ticks: {
-                              beginAtZero: true
-                          }
-                      }]
-                  }
-              }
-          });
         },
         error: function(err) {
           console.log(err);
-        }        
-      });    
+        }
+      });
       // console.log(resData);
     }
 
@@ -424,7 +382,7 @@
       else{//not the right object, return false so it will continue to iterate in the loop
         return false;
       }
-      
+
     }
 
     function search_select_node(obj, path) {
@@ -432,13 +390,13 @@
       if(obj.children || obj._children){ //if children are collapsed d3 object will have them instantiated as _children
         var children = (obj.children) ? obj.children : obj._children; // children이 펴져있는 애들이면 children, 접혀있는 애들이면 _children
         let flag = true;
-        for(var i=0; i<children.length; i++){ 
+        for(var i=0; i<children.length; i++){
           if (children[i].class == 'found') { // children의 class가(선택되어) found면
             search_select_node(children[i],path); // 재귀로 children을 계속 돔
             // flag = false; // flag를 false로 변환(없으면) => 걸림
           }
         }
-        if (flag) { 
+        if (flag) {
           if(obj.name != root) {
             path.push(obj); // 만약 class가 found면 path에 해당 children을 넣어줌
           }
@@ -452,7 +410,7 @@
         }
       }
     }
-  
+
     function extract_select2_data(node,leaves,index) {
             if (node.children){
                 for(var i = 0; i<node.children.length; i++){
@@ -464,45 +422,48 @@
             }
             return [index,leaves];
     }
-    
-    // let zoom = d3.behavior.zoom()
-    //   .scaleExtent([.1,1])
-    //   .on('zoom', function() {
-    //     svg.attr('transform', 'translate(' + d3.event.translate + ') scale(' + d3.event.scale + ')');
-    //   })
-    //   .translate([150,200]);
-
-    // var div = d3.select("body")
-    //   .append("div") // declare the tooltip div
-    //   .attr("class", "tooltip")
-    //   .style("opacity", 0);
-      var margin = {top: 1500, right: 25, bottom: 0, left: 50},
+    /*
+    let zoom = d3.behavior.zoom()
+      .scaleExtent([.1,1])
+      .on('zoom', function() {
+        svg.attr('transform', 'translate(' + d3.event.translate + ') scale(' + d3.event.scale + ')');
+      })
+      .translate([150,200]);
+      */
+    /*
+    var div = d3.select("body")
+      .append("div") // declare the tooltip div
+      .attr("class", "tooltip")
+      .style("opacity", 0);
+      */
+    var margin = {top: 1500, right: 25, bottom: 0, left: 50},
       width = 800 - margin.right - margin.left,
       height = 2750 - margin.top - margin.bottom;
-  
+
     var i = 0,
       duration = 750,
       root,
       select2_data;
-  
+
     var diameter = 960;
-  
+
     var tree = d3.layout.tree()
       // .size([height, width])
       .nodeSize([60, 60])
       .separation(function() {
         return .6;
       })
-  
+
     var diagonal = d3.svg.diagonal()
       .projection(function(d) { return [d.y, d.x]; });
-    
+
     let boxWidth = 150,
         boxHeight = 40;
 
     var svg = d3.select("#tree-left").append("svg")
       .attr("width", width + margin.right + margin.left)
       .attr("height", height + margin.top + margin.bottom)
+      //.attr("viewBox", `${0} ${0} ${width} ${-height}`)
       // .attr('width', 1500)
       // .attr('height', 800)
       .append("g")
@@ -510,10 +471,12 @@
       // .call(zoom)
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
       // .attr('transform', 'translate(150,200)');
-          //console.log(d3.select("#g-tech-tree"))
+
+        //console.log(d3.select("#g-tech-tree"))
       //console.log(document.getElementById("g-tech-tree").getBoundingClientRect().height/2)
     // 스크롤바 위치 변경
     document.getElementById("tree-left").scrollTop = document.getElementById("tree-left").getBoundingClientRect().height; //document.getElementById("g-tech-tree").getBoundingClientRect().height/2;
+      //console.log(document.getElementById("tree-left").scrollTop)
 
     //recursively collapse children
     function collapse(d) {
@@ -523,8 +486,8 @@
         d.children = null;
       }
     }
-        // 펼치기 구현 (위에 collapse는 접기)
-        function expand(d){
+    // 펼치기 구현 (위에 collapse는 접기)
+    function expand(d){
       if (d._children) {
         d.children = d._children;
         d.children.forEach(expand);
@@ -535,10 +498,6 @@
     //전체 펼치기 접기 구현
     let expandCollapseAllFlag = false
     function expandCollapseAll(){
-      let techCount = document.getElementById('tech_count');
-      techCount.innerHTML = '총 112개의 기술'
-      techCount.style.display = "flex";
-      
       if (!expandCollapseAllFlag) {
         root.children.forEach(expand);
         update(root);
@@ -551,7 +510,7 @@
         document.getElementById("tree-left").scrollTop = document.getElementById("tree-left").getBoundingClientRect().height;
       }
     }
-  
+
     // Toggle children on click
     function click(d) {
       if(d.class == 'found') {
@@ -581,18 +540,19 @@
           d._children = null;
         }
       }
-      
-      // if (d.children) {
-      //  d._children = d.children;
-      //   d.children = null;
-      //   }
-      //   else{
-      //   d.children = d._children;
-      //   d._children = null;
-      //   }
+      /*
+      if (d.children) {
+        d._children = d.children;
+        d.children = null;
+      }
+      else{
+        d.children = d._children;
+        d._children = null;
+      }
+      */
       update(d);
     }
-  
+
     function openPaths(paths) {
       for(var i =0; i<paths.length; i++){
         if(paths[i].id !== "1"){
@@ -605,7 +565,7 @@
         }
       }
     }
-  
+
     d3.json("js/data.json", function(error,values){
       if(error) {
         return console.error(error);
@@ -638,21 +598,21 @@
         alert(e.object.text+" not found!");
       }
     })
-  
-    // d3.select(self.frameElement).style("height", "1000px");
-  
+
+    //d3.select(self.frameElement).style("height", "1000px");
+
     function update(source) {
       // Compute the new tree layout.
       var nodes = tree.nodes(root).reverse(),
       links = tree.links(nodes);
-  
+
       // Normalize for fixed-depth.
       nodes.forEach(function(d) { d.y = d.depth * 150; });
-  
+
       // Update the nodesâ€¦
       var node = svg.selectAll("g.node")
         .data(nodes, function(d) { return d.id || (d.id = ++i); });
-  
+
       // Enter any new nodes at the parent's previous position.
       var nodeEnter = node.enter().append("g")
       .attr("class", "node")
@@ -662,7 +622,7 @@
       })
       .on("click", click);
       // .on('click', togglePerson);
-  
+
       nodeEnter.append("circle")
       .attr("r", 1e-6)
       .attr('class', 'circle')
@@ -677,7 +637,7 @@
       //   });
 
       nodeEnter.append("text")
-      .attr("dx", function(d) {
+        .attr("dx", function(d) {
           if (d.name == "Programming Language") {
             return "5em"
           }
@@ -709,12 +669,12 @@
         //   return d.name;
         // })
         // .style('fill-opacity', 0);
-  
+
       // Transition nodes to their new position.
       var nodeUpdate = node.transition()
         .duration(duration)
         .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
-  
+
       nodeUpdate.select("circle")
         .attr("r", 7.5)
         .style("fill", function(d) {
@@ -755,19 +715,19 @@
       //       return '#549BD6';
       //     }
       //   });
-        
+
       nodeUpdate.select("text")
         .style("fill-opacity", 1);
       // nodeUpdate.select('text')
       //   .attr('dx', -(boxWidth/2) + 5)
       //   .style('fill-opacity', 1);
-  
+
       // Transition exiting nodes to the parent's new position.
       var nodeExit = node.exit().transition()
         .duration(duration)
         .attr("transform", function(d) { return "translate(" + source.x + "," + source.y + ")"; })
         .remove();
-  
+
       nodeExit.select("circle")
         .attr("r", 1e-2);
       // nodeExit.select('rect')
@@ -777,22 +737,22 @@
       //     width: 0,
       //     height: 0
       //   });
-  
+
       nodeExit.select("text")
         .style("fill-opacity", 1e-6);
       // nodeExit.select('text')
       //   .style('fill-opacity', 0)
       //   .attr('dy', 0);
-        
+
       nodes.forEach(function(d) {
         d.x0 = d.x;
         d.y0 = d.y;
       })
-  
+
       // Update the linksâ€¦
       var link = svg.selectAll("path.link")
         .data(links, function(d) { return d.target.id; });
-  
+
       // Enter any new links at the parent's previous position.
       link.enter().insert("path", "g")
         .attr("class", "link")
@@ -806,7 +766,7 @@
       //     let o = {x: source.x0, y: (source.y0 + boxWidth/2)};
       //     return transitionElbow({source: o, target: o});
       //   });
-  
+
       // Transition links to their new position.
       link.transition()
         .duration(duration)
@@ -825,7 +785,7 @@
       //     }
       //   })
       //   .attr('d', elbow);
-  
+
       // Transition exiting nodes to the parent's new position.
       link.exit().transition()
         .duration(duration)
@@ -836,33 +796,13 @@
           // return transitionElbow({source: o, target: o});
         })
         .remove();
-  
+
       // Stash the old positions for transition.
       nodes.forEach(function(d) {
         d.x0 = d.x;
         d.y0 = d.y;
-        });
+      });
     }
-
-    // function elbow(d) {
-    //     var sourceX = d.source.x,
-    //         sourceY = d.source.y + (boxWidth / 2),
-    //         targetX = d.target.x,
-    //         targetY = d.target.y - (boxWidth / 2);
-
-    //     return "M" + sourceY + "," + sourceX
-    //       + "H" + (sourceY + (targetY-sourceY)/2)
-    //       + "V" + targetX 
-    //       + "H" + targetY;
-    //   }
-
-    // function transitionElbow(d){
-    //     return "M" + d.source.x + "," + d.source.x
-    //       + "H" + d.source.y
-    //       + "V" + d.source.x 
-    //       + "H" + d.source.y;
-    // }
-
   </script>
 
 
@@ -908,7 +848,7 @@
   };
   network = new vis.Network(container, data, options);
 */
- 
+
   var container = document.getElementById("mynetwork");
   var options = {
     nodes: {
@@ -955,7 +895,7 @@
   var data = { nodes: nodes, edges: edges };
   // Note: data is coming from ./data/WorldCup2014.js
   network = new vis.Network(container, data, options);
-  
+
 }
 
 window.addEventListener("load", () => {
@@ -969,7 +909,7 @@ window.addEventListener("load", () => {
 
   </script> -->
 
-    <div class="footer-dark text-left">
+    <div class="footer-dark">
     <footer>
         <div class="container">
             <div class="row">

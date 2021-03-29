@@ -44,13 +44,13 @@
     }
     let reqText = document.getElementById('requirement').innerHTML;
     let techs = document.getElementById('requirement').dataset.tech.split(',')
-    for (tech of techs) {
-      console.log(reqText.search(tech))
-      if (reqText.search(tech) != -1) {
-        reqText = reqText.replace(tech, `<b style="color:red;">${tech}</b>`)
-        reqText = reqText.toUpperCase();
-      }
-    }
+    // for (tech of techs) {
+    //   console.log(reqText.search(tech))
+    //   if (reqText.search(tech) != -1) {
+    //     reqText = reqText.replace(tech, `<b style="color:red;">${tech}</b>`)
+    //     reqText = reqText.toUpperCase();
+    //   }
+    // }
     document.getElementById('requirement').innerHTML = reqText;
 
     let match = [];
@@ -87,8 +87,19 @@
     //         // resultHtml.innerHTML = "POST Fetch <br />" + JSON.stringify(json)
     //       })
     //     }
+  //   $("img").each(function() {
+  //   var $imgTag = $(this);
+  //   var real_width, real_height;
 
+  //   $("<img/>")
+  //     .attr("src", $imgTag.attr("src"))
+  //     .load(function() {
+  //       real_width = this.width;
+  //       real_height = this.height;
+  //     });
+  // });
   })
+
 
   function gotologin() {
       location.replace('/login');
@@ -167,14 +178,25 @@
   <div class="recruit">
     <div class="container">
       <div class="row">
+        <% if(position_info.img_src != '') { %>
+          <div class="col-12 company-picture">
+            <img src="<%= position_info.img_src %>" />
+          </div>
+        <% }else { %>
+          <div></div>
+        <% } %>
         <div class="col-8">
           <div class="row">
             <div class="company_position">
               <div class="position col-12" id="position" data-position="<%=info.positionId%>">
-                <h3><%=position_info.position%></h3>
+                <% if(email == null) { %>
+                  <h3><%=position_info.position%></h3>
+                <% }else { %>
+                  <h3><%=position_info.position%><button class="btn-primary ml-5 btn-sm" onclick="add()">추가</button></h3>
+                 <% } %> 
               </div>
               <div class="company col-12" data-company="<%=position_info.company%>">
-                <h6><%=position_info.company%><button class="btn-secondary ml-3" onclick="add()">추가</button></h6>
+                <h6><%=position_info.company%></h6>
               </div>
             </div>
             <hr class="col-11">

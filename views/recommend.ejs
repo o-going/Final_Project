@@ -16,36 +16,94 @@
   <title>recommend</title>
 
   <script>
+    let filterarr = [];
+    let pageNum = 1;
+    let posts = 6;
+    let pageBar = 0;
+
     function filter() {
       let search = document.getElementById('search').value.toUpperCase();
       let position = document.getElementsByClassName('position');
-      let count = 0;
+      let pagination = document.getElementById('pagination'); 
 
+      let totalPost = 0;
+      let pageBar;
       for(let i=0; i<position.length; i++) {
         position[i].style.display = "none"
         let company = position[i].dataset.company;
         if(company.toUpperCase().includes(search)) {
-          // console.log(position[i]);
-          count++;
-
-          pageBar = Math.ceil(count / posts);
-          console.log(pageBar);
-
-          position[i].style.display = "flex";
-          }else {
-            position[i].style.display = "none"
-          }
+          totalPost++;
+          pageBar = Math.ceil(totalPost / posts);
+          filterarr.push(position[i]);
         }
       }
+      for(let j=0; j<filterarr.length; j++) {
+        filterarr[j].style.display = "none"
+        console.log(filterarr[j]);
+      }
+      for(k=(pageNum-1)*posts; k<pageNum*posts; k++) {
+        console.log(filterarr[k]);
+        filterarr[k].style.display = "flex";
+      }
 
-    let pageNum = 1;
-    let posts = 6;
-    let pageBar = 0;
+      console.log(`총${totalPost}개`);
+      console.log(`총${pageBar}페이지`);
+      console.log(filterarr);
+
+      let pageBarNum = pageBar;
+      console.log(pageBarNum);
+
+      pageBarStart = (pageBarNum * Math.floor((pageNum-1)/pageBarNum))+1
+      pagination.innerHTML = `<li class="page-item" id="page-item"><a class="page-link" href="#" onclick="move2(${Math.max(1, pageNum-pageBarNum)})"> << </a></li>`;
+      pagination.innerHTML += `<li class="page-item" id="page-item"><a class="page-link" href="#" onclick="move2(${Math.max(1, pageNum-1)})"> < </a></li>`;
+      for(let a=pageBarStart; a<=Math.min(pageBarStart+pageBarNum-1, pageBar); a++) {
+        if (a == pageNum) {
+          pagination.innerHTML += `<li class="page-item active" id="page-item"><a class="page-link" href="#" onclick="move2(${a})">${a}</a></li>`;
+        }
+        else {
+          pagination.innerHTML += `<li class="page-item" id="page-item"><a class="page-link" href="#" onclick="move2(${a})">${a}</a></li>`;
+        }
+      }
+      pagination.innerHTML += `<li class="page-item" id="page-item"><a class="page-link" href="#" onclick="move2(${Math.min(pageBar, pageNum+1)})"> > </a></li>`;
+      pagination.innerHTML += `<li class="page-item" id="page-item"><a class="page-link" href="#" onclick="move2(${Math.min(pageBar, pageNum+pageBarNum)})"> >> </a></li>`;
+    }
+
+  function move2(newPageNum) {
+    console.log('다음페이지!');
+    console.log(newPageNum);
+
+    // let page = document.querySelector('#display');
+    console.log(filterarr);
+    let child = [];
+    for(let i=0; i<filterarr.length; i++) {
+      child.push(filterarr[i]);
+    }
+    let pagination = document.getElementById('pagination');
+    let item = document.getElementById('page-item');
+
+    for(j=(pageNum-1)*posts; j<Math.min(pageNum*posts, child.length); j++) {
+      console.log(child[j]);
+      child[j].style.display = "none";
+    }
+    
+    pageNum = newPageNum;
+    // next랑 active 잘 안됨 -> 고쳐야함
+    for(k=(pageNum-1)*posts; k<Math.min(pageNum*posts, child.length); k++) {
+      console.log(child[k]);
+      child[k].style.display = "flex";
+      item.classList.add('active');
+    }
+  }
+
+    // let pageNum = 1;
+    // let posts = 6;
+    // let pageBar = 0;
 
     function movePageBar() {
       let pagination = document.getElementById('pagination'); 
       console.log(pagination);
       pageBarNum = 5;
+
       pageBarStart = (pageBarNum * Math.floor((pageNum-1)/pageBarNum))+1
       pagination.innerHTML = `<li class="page-item" id="page-item"><a class="page-link" href="#" onclick="move(${Math.max(1, pageNum-pageBarNum)})"> << </a></li>`;
       pagination.innerHTML += `<li class="page-item" id="page-item"><a class="page-link" href="#" onclick="move(${Math.max(1, pageNum-1)})"> < </a></li>`;
@@ -73,6 +131,7 @@
  
 
       $('.dropdown-item').on('click', function(e){
+        let pagination = document.getElementById('pagination'); 
         // console.log(e)
         let value = e.target.innerHTML;
         $('#dropdownMenuButton').html(value);
@@ -316,12 +375,13 @@
                     <div class="caption">
                       <h4 class= "caption-position"><%= i.position %><b class="match"></b></h4>
                       <p class="caption-company"><%=i.company %></p>
+                      <p class="period badge badge-warning"><%= i.period %></p>
+                      </br>
                       <% let tech_stack = JSON.parse(i.tech_stack) %>
                       <% for(let j=0; j<tech_stack.length; j++) {%>
                         <span id="techStack" class="badge badge-light"><%=tech_stack[j]%></span>
                       <% } %> 
                     </div>
-                  
                 </a>
               </div>
           </div>

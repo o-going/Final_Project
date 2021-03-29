@@ -93,7 +93,7 @@ router.get('/profile', async(req, res) => {
     let sql = `SELECT * FROM users WHERE email='${email}'`;
     let [user, col] = await con.query(sql);
     let userId;
-    for(let i=0; i<user.length; i++) {ㄴ
+    for(let i=0; i<user.length; i++) {
       userId = parseInt(user[i].id);
     }
     console.log(userId);
@@ -120,6 +120,12 @@ router.get('/profile', async(req, res) => {
   }
 });
 
+// router.delete('/profile', async(req, res) => {
+//   if(data != null) {
+//     res.send(true);
+//   }
+// })
+
 router.get('/techtree', async (req, res) => {
   try{
     let email = req.session.email;
@@ -140,21 +146,23 @@ router.get('/techtree', async (req, res) => {
 });
 
 router.post('/techtree', async(req, res) => {
-  try{
-    if(req.session.email == null) {
-      res.send(false);
-    }else{
-      let email = req.session.email;
-      let data = req.body.data;
-      let sql = `UPDATE users SET techtreedata='${data}' WHERE email='${email}'`
-      console.log(data);
-      console.log(sql);
-      await con.query(sql);
-      res.send(true);
-    };
-  }catch(err) {
-    console.log(err);
-  }
+  let data = req.body.data;
+  console.log(data);
+    try{
+      if(req.session.email == null) {
+        res.send(false);
+      }else{
+        let email = req.session.email;
+        let data = req.body.data;
+        let sql = `UPDATE users SET techtreedata='${data}' WHERE email='${email}'`
+        console.log(data);
+        console.log(sql);
+        await con.query(sql);
+        res.send(true);
+      };
+    }catch(err) {
+      console.log(err);
+    }
 });
 
 // let dataset_nodes;
@@ -444,7 +452,7 @@ router.get('/recommend', async(req, res) => {  // 얻어온 data
 
   try {
     let query = "SELECT "
-    query += "positions.position,companies.logo_src,companies.company,positions.positionId,positions.position_category,positions.tech_stack,positions.career "
+    query += "positions.position,companies.logo_src,companies.company,positions.positionId,positions.position_category,positions.tech_stack,positions.career,positions.period "
     query += "from companies JOIN positions ON companies.companyId = positions.companyId WHERE "
     query += `positions.tech_stack LIKE '%"${tech[0]}"%' `
     for(i=1; i<tech.length; i++) {
@@ -498,7 +506,11 @@ router.post('/recommend', async (req, res) => {
       }
       let [random, _]= await con.query(query);
       
-      res.status(200).send({companies: random});
+      console.log(random[0]);
+      console.log(random[1]);
+      res.status(200).send({
+        companies: random
+      });
     }
     
   }catch(err) {
@@ -520,14 +532,14 @@ router.get('/require/:id', async (req, res) => {
     // console.log(user);
     try {
     let query = "SELECT "
-        query += "positionId, companies.company, companies.location, positions.positionId, positions.position, positions.position_Info, positions.requirement, positions.preference, positions.tech_stack "
+        query += "positionId, companies.company, companies.location, companies.img_src, positions.positionId, positions.position, positions.position_Info, positions.requirement, positions.preference, positions.tech_stack "
         query += `FROM positions JOIN companies ON positions.companyId = companies.companyId WHERE positionId=`+id;
     // WHERE positionId="+id
 
     let positionInfo = await con.query(query)
     let info = positionInfo[0][0]
     // console.log(info);
-    // console.log(info.positionId);
+    // console.log(info.img_src);
 
     let position = info.position_Info
     let buff = Buffer.from(position, 'base64')
@@ -616,12 +628,15 @@ router.get('/', async (req, res) => {
 
         let usertech;
         for(let i=0; i<user.length; i++) {
+          if(user[i].techtreedata == null) {
+            break;
+          }
           usertech = user[i].techtreedata.split(',');
         }
         console.log(usertech);
-
+        
         let query = "SELECT "
-            query += "positions.position,companies.logo_src,companies.company,positions.positionId,positions.tech_stack,positions.career "
+            query += "positions.position,companies.logo_src,companies.company,positions.positionId,positions.tech_stack,positions.career,positions.period "
             query += "from companies JOIN positions ON companies.companyId = positions.companyId WHERE "
             query += `positions.tech_stack LIKE '%"${usertech[0]}"%' `
             for(i=1; i<usertech.length; i++) {
@@ -640,22 +655,52 @@ router.get('/', async (req, res) => {
         console.log(err);
       }
     }else {
+    }
       try{
         let query = "SELECT " // order by rand() LIMIT 6
-        query += "positions.position,companies.logo_src,companies.company,positions.positionId,positions.tech_stack "
+        query += "positions.position,companies.logo_src,companies.company,positions.positionId,positions.tech_stack,positions.period "
         query += "from companies JOIN positions ON companies.companyId = positions.companyId"
         let [random, _]= await con.query(query);
           // console.log(random)
+          let tech_list = [];
+          for(let j=0; j<random.length; j++) {
+            tech_stack = JSON.parse(random[j].tech_stack);
+            for(let k=0;  k<tech_stack.length; k++) {
+              if(tech_stack[k] == '') continue;
+              if(tech_list.includes(tech_stack[k]) == false) {
+                tech_list.push(tech_stack[k]);
+              }
+            }
+          }
+          // console.log(tech_list.length);
 
         res.render('main.ejs', {
           companyRandom: random,
+          techLength: tech_list.length,
           email: req.session.email,
           name: req.session.name,
         });
       }catch(err) {
         console.log(err);
       }
-    }
 });
+
+// router.get('/techtree2', async(req, res) => {
+//   try{
+//     let email = req.session.email;
+//     let sql = `SELECT * FROM users WHERE email='${email}'`;
+//     console.log(email);
+//     console.log(sql);
+//     let [user, _] = await con.query(sql);
+//     console.log(user);
+//     res.render('techtree2', {
+//       email: email,
+//       name: req.session.name,
+//       user: user
+//     });
+//   }catch(err) {
+//     console.log(err);
+//   }
+// });
 
 module.exports = router;

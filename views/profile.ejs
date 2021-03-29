@@ -19,19 +19,25 @@
 <body>
   <script>
     function remove() {
+      let arr = [];
+      let count = 0;
       let click = document.querySelectorAll('#clickBox');
       console.log(click);
-      let count = 0;
-      click.addEventListener('click', function(e) {
+      arr.push(click);
+      for(let i=0; i<click.length; i++) {
+        console.log(click[i]);
+
+        click[i].addEventListener('click', function(e) {
         e.preventDefault();
-        click.classList.add("filter");
+        click[i].classList.add("filter");
         count++;
         if(count % 2 == 0) {
-          click.classList.remove("filter");
+          click[i].classList.remove("filter");
         }
          console.log(count);
       });
 
+      }
     }
   </script>
 <!-- Navigation-->
@@ -64,7 +70,7 @@
                   <div class="card">
                     <div class="card-body">
                       <div class="d-flex flex-column align-items-center text-center">
-                        <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="Admin" class="rounded-circle" width="150">
+                        <img src="https://us.123rf.com/450wm/thesomeday123/thesomeday1231712/thesomeday123171200009/91087331-%EB%82%A8%EC%84%B1%EC%9D%84%EC%9C%84%ED%95%9C-%EA%B8%B0%EB%B3%B8-%EC%95%84%EB%B0%94%ED%83%80-%ED%94%84%EB%A1%9C%ED%95%84-%EC%95%84%EC%9D%B4%EC%BD%98-%ED%9A%8C%EC%83%89-%EC%82%AC%EC%A7%84-%EC%9E%90%EB%A6%AC-%ED%91%9C%EC%8B%9C-%EC%9E%90-%EC%9D%BC%EB%9F%AC%EC%8A%A4%ED%8A%B8-%EB%B2%A1%ED%84%B0.jpg?ver=6" alt="Admin" class="rounded-circle" width="150">
                         <div class="mt-3">
                           <h4><%= name %></h4>
                           <p class="text-secondary mb-1">Student</p>

@@ -54,12 +54,11 @@
     for(let i=0; i<child.length; i++) {
       child[i].style.display = "none";
     }
-    // page.innerHTML = "";
+
     for(j=(pageNum-1)*posts; j<pageNum*posts; j++) {
       console.log(child[j]);
       child[j].style.display = "flex";
     }
-    // <li class="page-item"><a class="page-link" href="#">1</a></li>
     movePageBar();
   });
 
@@ -104,10 +103,10 @@
           <ul class="nav navbar-nav navbar-right">
             <li><a href="techtree" class="page-scroll">TechTree</a></li>
             <% if(email == null) { %>
-              <li class="login"><a href="Login" class="page-scroll">Login</a></li>
+              <li class="login"><a href="http://localhost:3000/Login" class="page-scroll">Login</a></li>
             <% }else { %>
-              <li><a href="profile" class="page-scroll"><%=name%>님</a></li>
-              <li class="logout"><a href="Logout" class="page-scroll">Logout</a></li>
+              <li><a href="http://localhost:3000/profile" class="page-scroll"><%=name%>님</a></li>
+              <li class="logout"><a href="http://localhost:3000/Logout" class="page-scroll">Logout</a></li>
             <% } %>
           </ul>
         </div>
@@ -120,8 +119,8 @@
           <div class="row">
             <div class="col-5 intro-text">
               <h1>Tech Tree</h1>
-              <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Iusto, et tenetur. Reprehenderit iste aperiam sint, tempora maxime molestiae quam placeat?</p>
-              <a href="techtree" class="btn btn-custom btn-lg page-scroll">페이지 바로가기</a> 
+              <p>웹 개발, 애플리케이션 개발, 일반 소프트웨어 개발, <br/ >웹 디자인 등 관련 직무 수치 및 총 112개의 Tech Tree 기술을 바탕으로 한 맞춤 구인공고</p>
+              <a href="techtree" class="btn btn-custom btn-lg page-scroll">Go to Page</a> 
             </div>
             <div class="col-6 intro">
               <img src="images/Pair programming-amico.png" alt="image">
@@ -138,15 +137,20 @@
           <div class="col-12 random-text">
             <% if(email != null) { %>
                 <% for(let i=0; i<user.length; i++) { %>
-                  <h2 class="page-header text-center mb-3">
-                    현재 채용 중인<strong> Positions</strong>
-                  </h2>
-                  <h5 class="techtreedata text-center"><%=name%>님의 선택기술: <%=user[i].techtreedata%></h5>
+                  <div class="page-header text-center">
+                    <h3 class="techtreedata text-center"><%=name%>님의 선택기술 <strong><%=user[i].techtreedata%></strong>에 맞는</h3>
+                    <h4>현재 채용 중인 <strong><%=companyRandom.length%>개</strong>의 기업 포지션</h4>
+                  </div>
                 <% } %>
             <% }else { %>
-                <h2 class="page-header text-center">
-                  현재 채용 중인<strong> Positions</strong>
-                </h2>
+              <div class="page-header text-center">
+                <!-- <div class="header-banner text-center"> -->
+                  <h2>
+                    현재 채용 중인 기업 포지션
+                  </h2>
+                  <h4>총 <%=companyRandom.length%>개</h4>
+                <!-- </div> -->
+              </div>
             <% } %>
         </div>
         </div>
@@ -172,6 +176,8 @@
                         <div class="caption">
                           <h4><%= p.position %></h4>
                           <p><%=p.company %></p>
+                          <p class="period badge badge-warning"><%= p.period %></p>
+                          </br>
                           <% let tech_stack = JSON.parse(p.tech_stack) %>
                           <% for(let j=0; j<tech_stack.length; j++) {%>
                             <span class="badge badge-light"><%=tech_stack[j]%></span>

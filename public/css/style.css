@@ -93,20 +93,21 @@ a {
 
 .intro-text h1 {
 	font-family: 'Raleway', sans-serif;
-	color: #000;
-	font-size: 82px;
-	font-weight: 700;
+	color: rgb(43, 43, 43);
+	font-size:75px;
+	font-weight: 800;
 	text-transform: uppercase;
 	margin-top: 0;
+	/* line-height: 59px; */
 }
 .intro-text p {
-	color: #aaa;
-	font-size: 22px;
+	color: rgb(150, 150, 150);
+	font-size: 18px;
 	font-weight: 300;
 	line-height: 30px;
 	margin: 0 auto;
 	/* margin-top: 30px; */
-	margin: 30px 0 50px 0;
+	margin: 30px 0 40px 0;
 }
 
 /* button */
@@ -145,9 +146,9 @@ a {
   background-color: #f7fafc;
 }
 
-.page-header {
-	margin: 50px 0;
-}
+/* .page-header {
+	margin: 10px 0;
+} */
 
 .random{
 	margin: 30px 0px 20px 0;
@@ -215,7 +216,7 @@ a {
 .picture-list .caption h4{
 	margin-top: 10px;
 	margin-right: 10px;
-	font-size: 18px;
+	font-size: 16px;
 	font-weight: 600;
 	
 }
@@ -224,17 +225,47 @@ a {
 	font-size: 14px;
 	font-weight: 500;
 	color: #444;
+	margin-bottom: 5px;
 }
 
 .picture-list .caption span {
-	font-size: 10.5px;
+	font-size: 10px;
 }
 
-.techtreedata {
-	margin-bottom: 50px;
-	color: rgb(37, 54, 141);
+.picture-list .caption p.period {
+	font-size: 11px;
+	/* font-weight: 600; */
+	color: #000000;
+	margin-bottom: 4px;
 }
 
+.techtreedata strong{
+	color: rgb(39, 108, 165);
+}
+
+.techtreedata{
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+.page-header {
+	/* display: inline-block; */
+	margin: 40px 0;
+}
+
+.page-header h2 {
+	margin-top: 20px;
+}
+
+.page-header h4 {
+	/* margin-top: 20px; */
+	color: rgb(95, 95, 95);
+}
+
+.page-header p {
+	font-size: 80px;
+	color: rgb(95, 95, 95);
+}
 
 /* recommend */
 
@@ -308,13 +339,28 @@ a {
 }
 
 .tree_btn {
-	margin: 60px 20px;
+	margin: 30px 15px;
+	font-size: 16px;
+	font-weight: 600;
+	border-radius: 100px;
+	padding: 10px 10px;
+}
+
+#tech_count {
+	font-weight: 600;
+	float: left;
+	margin-top: 32px;
+}
+
+.tree_btn_group {
+	text-align: start;
+	margin-left: 500px;
 }
 
 #tree-right {
 	position: absolute;
-	top: 30%;
-	left: 62%;
+	top: 15%;
+	left: 58%;
 }
 
 /* #right-text {
@@ -334,6 +380,7 @@ a {
 	color: #555;
 }
 
+
 /* #choice h2 {
 	font-size: 28px;
 	margin-bottom: 30px;
@@ -341,15 +388,14 @@ a {
 
 .right-info {
 	font-family: Noto Sans;
-	font-style: normal;
-	font-weight: normal;
-	font-size: 24px;
-	line-height: 32px;
+	font-weight: 700;
+	font-size: 14px;
+	/* line-height: 32px; */
 /* identical to box height, or 133% */
 	text-align: center;
 	letter-spacing: -0.01em;
 	color: #2B292D;
-	margin-bottom: 34px;
+	/* margin-bottom: 34px; */
 }
 
 li.right-info {
@@ -357,18 +403,84 @@ li.right-info {
 }
 
 .right-title {
-	font-family: Noto Sans;
+	/* font-family: Noto Sans; */
 	font-style: normal;
 	font-weight: bold;
-	font-size: 36px;
-	line-height: 72px;
+	font-size: 26px;
+	/* line-height: 72px; */
 	/* identical to box height, or 200% */
 	text-align: center;	
-	letter-spacing: 0.045em;
+	/* letter-spacing: 0.045em; */
 	color: #2B292D;
+	margin-top: 65px;
+	margin-bottom: 40px;
+}
+
+.right-title span {
+	font-size: 18px;
+}
+
+.choice-title {
+	/* font-family: Noto Sans; */
+	font-style: normal;
+	font-weight: bold;
+	font-size: 26px;
+	margin-bottom: 40px;
+}
+
+.choice-title span{
+	font-size: 18px;
+}
+
+.entire-info {
+	margin-top: 35px;
+	font-weight: 700;
+}
+
+.right-company {
+	display: inline-block;
+	/* float: left; */
+	margin: 0 25px;
+	width: 280px;
+	height: 250px;
+	/* border: 1px solid #ccc; */
+	box-shadow: 0 2px 8px 0 rgba(0,0,0,0.16);
+}
+
+.right-company .caption h4 {
+	font-size: 17px;
+	font-weight: 600;
+}
+
+.right-company .caption p {
+	font-size: 14px;
+	color: #555;
+}
+
+.right-pictures img {
+	width: 100px;
+	height: 100px;
+	border-radius: 0.25rem;
+	margin-bottom: 20px;
+}
+
+p.more {
+	margin-bottom: 30px;
+}
+
+p.more a{
+	font-size: 14px;
 }
 
 /* require */
+
+.company-picture img{
+	/* margin-top: 50px; */
+	width: 100%;
+	height: 500px;
+	border-radius: 5px;
+	box-shadow:0 1px 1px rgba(0,0,0,0.12),0 2px 2px rgba(0,0,0,0.12),0 4px 4px rgba(0,0,0,0.12),0 8px 8px rgba(0,0,0,0.12),0 16px 16px rgba(0,0,0,0.12)
+}
 
 .company_position .position h3{
 	font-weight: 700;
